@@ -7,12 +7,14 @@
 
 #ifndef CYCLE_H_
 #define CYCLE_H_
+#include "Coords.h"
 
 class Cycle {
 	Coords pos, lastPos;
 	float direction;
 	int ID;
 	float speed;
+	int leftKey, rightKey;
 public:
 	Cycle(Coords, float, int);
 	virtual ~Cycle();

@@ -9,12 +9,19 @@
 #ifndef WORLD_H_
 #define WORLD_H_
 
+#include <vector>
+#include "Trail.h"
+#include "Cycle.h"
+#include "WorldItem.h"
+
 class World {
+	static int numPlayers;
 	int width, height;
 	Trail trails[];
-
+	Cycle cycles[];
+	std::vector<WorldItem> items;
 public:
-	World();
+	World(int, int, int); //width, height, numPlayers
 	virtual ~World();
 };
 
