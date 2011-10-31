@@ -9,13 +9,19 @@
 #include "Trail.h"
 #include "World.h"
 #include "Coords.h"
+#include <iostream>
 using namespace std;
 
 World::World(int w, int h, int n) {
-	// TODO Auto-generated constructor stub
-	width = w;
-	height = h;
-	numPlayers = n;
+    width = w;
+    height = h;
+    numPlayers = n;
+    trails = new Trail[numPlayers];
+    cycles = new Cycle[numPlayers];
+    for (int i = 0; i < n; i++) {
+        trails[i] = Trail(Coords(w/2, h/2), i);
+        cycles[i] = Cycle(Coords(w/2, h/2), i*90.0, i);
+    }
 }
 
 World::~World() {
