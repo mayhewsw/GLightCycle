@@ -14,8 +14,8 @@
 
 #define DEG_TO_RAD M_PI/180.0
 
-int windowWidth = 500;
-int windowHeight = 500;
+int windowWidth = 1024;
+int windowHeight = 768;
 
 void init() {
 	int r_bits =8, g_bits = 8, b_bits = 8, a_bits=8;
@@ -142,35 +142,33 @@ void drawWorld(World *state) {
 		int i, j;
 		GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
 
-		glMatrixMode(GL_MODELVIEW);
-
 		glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
-//		glPushMatrix();
-//
-//		for (i=0; i<state->width; i++) {
-//			for (j=0; j<state->height; j++) {
-//				drawPlane();
-//				glTranslated(1.0, 0.0, 0.0);
-//			}
-//			glTranslated(-state->height, 1.0, 0.0);
-//		}
-//		glPopMatrix();
+		glPushMatrix();
+
+		for (i=0; i<state->width; i++) {
+			for (j=0; j<state->height; j++) {
+				drawPlane();
+				glTranslated(1.0, 0.0, 0.0);
+			}
+			glTranslated(-state->height, 1.0, 0.0);
+		}
+		glPopMatrix();
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glBegin(GL_POLYGON);
-		{
-			glVertex3f(0.0, 0.0, 0.0);
-			glVertex3f(state->width, 0.0, 0.0);
-			glVertex3f(state->width, state->height, 0.0);
-			glVertex3f(0.0, state->height, 0.0);
-		}
-		glEnd();
-
-//		for (i=0; i<state->getNumPlayers(); i++) {
-//			drawTrail(&(state->getTrails())[i]);
-//			drawCycle(&(state->getCycles())[i]);
+//		glBegin(GL_POLYGON);
+//		{
+//			glVertex3f(0.0, 0.0, 0.0);
+//			glVertex3f(state->width, 0.0, 0.0);
+//			glVertex3f(state->width, state->height, 0.0);
+//			glVertex3f(0.0, state->height, 0.0);
 //		}
+//		glEnd();
+
+		for (i=0; i<state->getNumPlayers(); i++) {
+			drawTrail(&(state->getTrails())[i]);
+			drawCycle(&(state->getCycles())[i]);
+		}
 	}
 
 	glfwSwapBuffers();
