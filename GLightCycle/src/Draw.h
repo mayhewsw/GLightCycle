@@ -10,10 +10,11 @@
 
 #include "World.h"
 
-class Draw {
-public:
-	Draw();
-	virtual ~Draw();
-};
+void init();
+void drawWorld(World *);
+void drawPlane();
+void drawTrail(Trail *);
+void drawCycle(Cycle *);
+void drawItem(WorldItem *);
 
 #endif /* DRAW_H_ */

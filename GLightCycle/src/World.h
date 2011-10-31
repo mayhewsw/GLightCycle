@@ -16,13 +16,19 @@
 
 class World {
 	int numPlayers;
-	int width, height;
 	Trail trails[];
 	Cycle cycles[];
 	std::vector<WorldItem> items;
 public:
+	int width, height;
 	World(int, int, int); //width, height, numPlayers
 	virtual ~World();
+	Cycle *getCycles();
+	std::vector<WorldItem> getItems();
+	int getNumPlayers();
+	Trail *getTrails();
+	int getWidth();
+	void setNumPlayers(int);
 };
 
 #endif /* WORLD_H_ */

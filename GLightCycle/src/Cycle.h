@@ -14,7 +14,7 @@ class Cycle {
 	float direction;
 	int ID;
 	float speed;
-	GLFWenum leftKey, rightKey;
+	int leftKey, rightKey;
 public:
 	Cycle();
 	Cycle(Coords, float, int);

@@ -21,3 +21,29 @@ World::World(int w, int h, int n) {
 World::~World() {
 	// TODO Auto-generated destructor stub
 }
+
+Cycle *World::getCycles() {
+	return cycles;
+}
+
+std::vector<WorldItem> World::getItems() {
+	return items;
+}
+
+int World::getNumPlayers() {
+	return numPlayers;
+}
+
+Trail *World::getTrails() {
+	return trails;
+}
+
+int World::getWidth()
+{
+	return width;
+}
+
+void World::setNumPlayers(int np)
+{
+	numPlayers = np;
+}
