@@ -9,17 +9,12 @@
 #define COORDS_H_
 
 class Coords {
-	float x, y, z;
 public:
+	float x, y, z;
 	Coords();
 	Coords(float, float);
 	Coords(float, float, float);
 	virtual ~Coords();
-	float getX(void);
-	float getY(void);
-	float getZ(void);
-	void set (float, float);
-	void set(float, float, float);
 };
 
 #endif /* COORDS_H_ */

@@ -14,8 +14,9 @@ class Cycle {
 	float direction;
 	int ID;
 	float speed;
-	int leftKey, rightKey;
+	GLFWenum leftKey, rightKey;
 public:
+	Cycle();
 	Cycle(Coords, float, int);
 	virtual ~Cycle();
 	Coords getPos();
@@ -24,6 +25,8 @@ public:
 	void setDirection(float);
 	float getSpeed();
 	void setSpeed(float);
+	bool isLeftKeyPressed();
+	bool isRightKeyPressed();
 };
 
 #endif /* CYCLE_H_ */

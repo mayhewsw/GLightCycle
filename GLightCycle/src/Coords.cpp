@@ -29,26 +29,3 @@ Coords::Coords(float a, float b, float c) {
 Coords::~Coords() {
 	// TODO Auto-generated destructor stub
 }
-
-float Coords::getX() {
-	return x;
-}
-
-float Coords::getY() {
-	return y;
-}
-
-float Coords::getZ() {
-	return z;
-}
-
-void Coords::set(float a, float b) {
-	x = a;
-	y = b;
-}
-
-void Coords::set(float a, float b, float c) {
-	x = a;
-	y = b;
-	z = c;
-}

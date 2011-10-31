@@ -16,14 +16,6 @@ World::World(int w, int h, int n) {
 	width = w;
 	height = h;
 	numPlayers = n;
-
-	Coords startingPos[numPlayers] = { Coords::Coords(0, 0), Coords::Coords(0, h),
-						  Coords::Coords(w, h), Coords::Coords(w, 0) };
-
-	int i;
-	for (i=0; i<numPlayers; i++) {
-		cycles[i] = Cycle::Cycle(startingPos[0], 0, i);
-	}
 }
 
 World::~World() {

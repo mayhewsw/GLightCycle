@@ -9,6 +9,10 @@
 #include "Cycle.h"
 using namespace std;
 
+Cycle::Cycle() {
+
+}
+
 Cycle::Cycle(Coords start, float dir, int color) {
 	// TODO Auto-generated constructor stub
 	pos = start;

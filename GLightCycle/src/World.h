@@ -15,7 +15,7 @@
 #include "WorldItem.h"
 
 class World {
-	static int numPlayers;
+	int numPlayers;
 	int width, height;
 	Trail trails[];
 	Cycle cycles[];
