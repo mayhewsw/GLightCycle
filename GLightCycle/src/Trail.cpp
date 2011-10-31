@@ -13,9 +13,10 @@ Trail::Trail() {
 
 }
 
-Trail::Trail(Coords start) {
+Trail::Trail(Coords start, int newID) {
 	// TODO Auto-generated constructor stub
 	points.push_back(start);
+	ID = newID;
 }
 
 Trail::~Trail() {

@@ -16,8 +16,8 @@
 
 class World {
 	int numPlayers;
-	Trail trails[];
-	Cycle cycles[];
+	Trail *trails;
+	Cycle *cycles;
 	std::vector<WorldItem> items;
 public:
 	int width, height;

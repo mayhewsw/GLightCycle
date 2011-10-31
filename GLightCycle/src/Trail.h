@@ -16,7 +16,7 @@ class Trail {
 	int ID;
 public:
 	Trail();
-	Trail(Coords);
+	Trail(Coords, int);
 	virtual ~Trail();
 	void addPoint(Coords);
 	std::vector<Coords> getPoints();
