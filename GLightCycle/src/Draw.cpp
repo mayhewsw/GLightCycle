@@ -8,8 +8,6 @@
 #include <vector>
 #include <math.h>
 #include "Draw.h"
-#include <GL.h>
-#include <glu.h>
 #include <glfw.h>
 
 int windowWidth = 1024;
@@ -122,6 +120,9 @@ void drawWorld(World *state) {
 	int p;
 
 	for (p=0; p<state->getNumPlayers(); p++) {
+		if (state->getCycles()[p].getIsDead()) {
+			continue;
+		}
 		if (state->getNumPlayers() == 3) {
 			if (p==2) {
 				glMatrixMode(GL_PROJECTION);
@@ -169,16 +170,6 @@ void drawWorld(World *state) {
 			glTranslated(-state->height, 1.0, 0.0);
 		}
 		glPopMatrix();
-
-//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//		glBegin(GL_POLYGON);
-//		{
-//			glVertex3f(0.0, 0.0, 0.0);
-//			glVertex3f(state->width, 0.0, 0.0);
-//			glVertex3f(state->width, state->height, 0.0);
-//			glVertex3f(0.0, state->height, 0.0);
-//		}
-//		glEnd();
 
 		for (i=0; i<state->getNumPlayers(); i++) {
 			drawTrail(&(state->getTrails())[i]);
@@ -246,23 +237,27 @@ void drawTrail(Trail *t) {
 	glMaterialfv(GL_FRONT, GL_EMISSION, trail_emissive);
 	glMaterialf(GL_FRONT, GL_SHININESS, trail_shininess);
 
-	std::vector<Coords> points = t->getPoints();
+	std::vector<Coords> *points = t->getPoints();
+
 	int i;
 
-	for(i=1; i<(int)points.size(); i++) {
+	for(i=1; i<(int)points->size(); i++) {
 		glBegin(GL_LINE_LOOP);
 		{
 			glLineWidth(3.0);
-			glVertex3f(points[i-1].x, points[i-1].y, 0.0);
-			glVertex3f(points[i].x, points[i].y, 0.0);
-			glVertex3f(points[i].x, points[i].y, trail_height);
-			glVertex3f(points[i-1].x, points[i-1].y, trail_height);
+			glVertex3f((*points)[i-1].x, (*points)[i-1].y, 0.0);
+			glVertex3f((*points)[i].x, (*points)[i].y, 0.0);
+			glVertex3f((*points)[i].x, (*points)[i].y, trail_height);
+			glVertex3f((*points)[i-1].x, (*points)[i-1].y, trail_height);
 		}
 		glEnd();
 	}
 }
 
 void drawCycle(Cycle *c) {
+	if (c->getIsDead()) {
+		return;
+	}
 	GLUquadricObj *sphere;
 	sphere = gluNewQuadric();
 	gluQuadricDrawStyle(sphere, GLU_FILL);
