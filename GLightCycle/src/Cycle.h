@@ -17,16 +17,17 @@ class Cycle {
 	int leftKey, rightKey;
 public:
 	Cycle();
-	Cycle(Coords, float, int);
+	Cycle(Coords, float, int, int, int);
 	virtual ~Cycle();
 	Coords getPos();
 	void setPos(Coords);
 	float getDirection();
 	void setDirection(float);
+	int getID();
 	float getSpeed();
 	void setSpeed(float);
-	bool isLeftKeyPressed();
-	bool isRightKeyPressed();
+	int getLeftKey();
+	int getRightKey();
 };
 
 #endif /* CYCLE_H_ */

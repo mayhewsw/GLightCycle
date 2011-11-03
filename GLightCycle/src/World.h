@@ -23,6 +23,8 @@ public:
 	int width, height;
 	World(int, int, int); //width, height, numPlayers
 	virtual ~World();
+	void move();
+	void turn(Cycle *);
 	Cycle *getCycles();
 	std::vector<WorldItem> getItems();
 	int getNumPlayers();

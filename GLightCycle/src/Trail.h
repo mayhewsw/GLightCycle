@@ -20,6 +20,7 @@ public:
 	virtual ~Trail();
 	void addPoint(Coords);
 	std::vector<Coords> getPoints();
+	int getID();
 };
 
 #endif /* TRAIL_H_ */

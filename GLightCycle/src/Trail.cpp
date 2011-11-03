@@ -30,3 +30,7 @@ void Trail::addPoint(Coords point) {
 std::vector<Coords> Trail::getPoints() {
 	return points;
 }
+
+int Trail::getID() {
+	return ID;
+}

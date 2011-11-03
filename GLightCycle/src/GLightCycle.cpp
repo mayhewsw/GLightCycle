@@ -15,7 +15,7 @@ using namespace std;
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
-	World game = World::World(30, 30, 4);
+	World game = World::World(50, 50, 4);
 
 	/* GLFW initialization */
 	glfwInit();
@@ -25,6 +25,7 @@ int main() {
 
 	while (running) {
 		drawWorld(&game);
+		game.move();
 		running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
 	}
 

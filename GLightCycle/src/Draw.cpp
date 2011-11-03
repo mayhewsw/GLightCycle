@@ -12,8 +12,6 @@
 #include <glu.h>
 #include <glfw.h>
 
-#define DEG_TO_RAD M_PI/180.0
-
 int windowWidth = 1024;
 int windowHeight = 768;
 
@@ -32,8 +30,6 @@ void init() {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-	gluPerspective(60.0, (float)(windowWidth)/windowHeight, 0.1, 200);
 
 	glMatrixMode(GL_MODELVIEW);
 
@@ -58,21 +54,27 @@ void init() {
 void drawWorld(World *state) {
 	int viewports[4][4];
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	if (state->getNumPlayers() == 1) {
 		viewports[0][0] = 0;
 		viewports[0][1] = 0;
 		viewports[0][2] = windowWidth;
 		viewports[0][3] = windowHeight;
+
+		gluPerspective(60.0, (float)(windowWidth)/windowHeight, 0.1, 200);
 	} else if (state->getNumPlayers() == 2) {
 		viewports[0][0] = 0;
-		viewports[0][1] = 0;
+		viewports[0][1] = windowHeight/2;
 		viewports[0][2] = windowWidth;
 		viewports[0][3] = windowHeight/2;
 
 		viewports[1][0] = 0;
-		viewports[1][1] = windowHeight/2;
+		viewports[1][1] = 0;
 		viewports[1][2] = windowWidth;
 		viewports[1][3] = windowHeight/2;
+
+		gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
 	} else if (state->getNumPlayers() == 3) {
 		viewports[0][0] = 0;
 		viewports[0][1] = windowHeight/2;
@@ -88,6 +90,8 @@ void drawWorld(World *state) {
 		viewports[2][1] = 0;
 		viewports[2][2] = windowWidth;
 		viewports[2][3] = windowHeight/2;
+
+		gluPerspective(60.0, (float)(windowWidth)/windowHeight, 0.1, 200);
 	} else {
 		viewports[0][0] = 0;
 		viewports[0][1] = windowHeight/2;
@@ -108,19 +112,30 @@ void drawWorld(World *state) {
 		viewports[3][1] = 0;
 		viewports[3][2] = windowWidth/2;
 		viewports[3][3] = windowHeight/2;
+
+		gluPerspective(60.0, (float)(windowWidth)/windowHeight, 0.1, 200);
 	}
+	glMatrixMode(GL_MODELVIEW);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int p;
 
 	for (p=0; p<state->getNumPlayers(); p++) {
+		if (state->getNumPlayers() == 3) {
+			if (p==2) {
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
+				glMatrixMode(GL_MODELVIEW);
+			}
+		}
 		Cycle player = state->getCycles()[p];
 
 		// Calculate the camera position
-		GLfloat camera_pos[3] = { player.getPos().x - 5 * cos(player.getDirection()
-				* DEG_TO_RAD), player.getPos().y - 5
-				* sin(player.getDirection() * DEG_TO_RAD), 5.0 };
+		GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(player.getDirection()
+				* DEG_TO_RAD), player.getPos().y - 6
+				* sin(player.getDirection() * DEG_TO_RAD), 3.0 };
 
 		// Calculate the camera's direction
 		GLfloat camera_dir[3] = {
@@ -155,7 +170,7 @@ void drawWorld(World *state) {
 		}
 		glPopMatrix();
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //		glBegin(GL_POLYGON);
 //		{
 //			glVertex3f(0.0, 0.0, 0.0);
@@ -206,9 +221,22 @@ void drawPlane() {
 void drawTrail(Trail *t) {
 	GLfloat trail_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat trail_ambient[] = { 1.0, 0.1, 0.1, 0.0 };
-	GLfloat trail_emissive[] = { 1.0, 0.1, 0.1, 0.0 };
 	GLfloat trail_shininess = 0.0;
+	float r=0.1,g=0.1,b=0.1,a=0.1;
+
+	if (t->getID() == 0) {
+		r = 1.0;
+	} else if (t->getID() == 1) {
+		g = 1.0;
+	} else if (t->getID() == 2) {
+		b = 1.0;
+	} else {
+		r = 1.0;
+		g = 1.0;
+	}
+
+	GLfloat trail_ambient[] = { r, g, b, a };
+	GLfloat trail_emissive[] = { r, g, b, a };
 
 	GLfloat trail_height = 0.5;
 
@@ -222,8 +250,9 @@ void drawTrail(Trail *t) {
 	int i;
 
 	for(i=1; i<(int)points.size(); i++) {
-		glBegin(GL_POLYGON);
+		glBegin(GL_LINE_LOOP);
 		{
+			glLineWidth(3.0);
 			glVertex3f(points[i-1].x, points[i-1].y, 0.0);
 			glVertex3f(points[i].x, points[i].y, 0.0);
 			glVertex3f(points[i].x, points[i].y, trail_height);
@@ -239,9 +268,22 @@ void drawCycle(Cycle *c) {
 	gluQuadricDrawStyle(sphere, GLU_FILL);
 
 	GLfloat cycle_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat cycle_diffuse[] = { 1.0, 0.0, 0.0, 1.0 };
-	GLfloat cycle_ambient[] = { 1.0, 0.1, 0.1, 0.0 };
 	GLfloat cycle_shininess = 128.0;
+	float r=0.1,g=0.1,b=0.1,a=0.1;
+
+	if (c->getID() == 0) {
+		r = 1.0;
+	} else if (c->getID() == 1) {
+		g = 1.0;
+	} else if (c->getID() == 2) {
+		b = 1.0;
+	} else {
+		r = 1.0;
+		g = 1.0;
+	}
+
+	GLfloat cycle_ambient[] = { r, g, b, a };
+	GLfloat cycle_diffuse[] = { r, g, b, a };
 
 	glMaterialfv(GL_FRONT, GL_SPECULAR, cycle_specular);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, cycle_ambient);

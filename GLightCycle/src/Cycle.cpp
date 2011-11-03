@@ -13,13 +13,15 @@ Cycle::Cycle() {
 
 }
 
-Cycle::Cycle(Coords start, float dir, int color) {
+Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	// TODO Auto-generated constructor stub
 	pos = start;
 	lastPos = start;
 	direction = dir;
 	ID = color;
-	speed = 0.1;
+	speed = 0.2;
+	leftKey = left;
+	rightKey = right;
 }
 
 Cycle::~Cycle() {
@@ -43,10 +45,22 @@ void Cycle::setDirection(float newDir) {
 	direction = newDir;
 }
 
+int Cycle::getID() {
+	return ID;
+}
+
 float Cycle::getSpeed() {
 	return speed;
 }
 
 void Cycle::setSpeed(float newSpeed) {
 	speed = newSpeed;
+}
+
+int Cycle::getLeftKey() {
+	return leftKey;
+}
+
+int Cycle::getRightKey() {
+	return rightKey;
 }
