@@ -34,6 +34,8 @@ typedef struct debrisData
 #define NUM_PARTICLES 1000
 #define NUM_DEBRIS 70
 
+#define INITIAL_EXPLOSION_TIME 500
+
 
 class Cycle {
 	Coords pos, lastPos;
@@ -46,7 +48,6 @@ class Cycle {
 	particleData particles[NUM_PARTICLES];
 	debrisData   debris[NUM_DEBRIS]; 
 
-	void initExplosion();
 	void newSpeed(float[]);
 
 public:
@@ -69,8 +70,9 @@ public:
 	
 	particleData *getParticles();
 	debrisData *getDebris();
-
 	
+	void initExplosion(int, int, int);
+
 };
 
 #endif /* CYCLE_H_ */

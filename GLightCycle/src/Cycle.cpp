@@ -25,8 +25,7 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	leftKey = left;
 	rightKey = right;
 	isDead = 0;
-	explosionTime = 500;
-	initExplosion();
+	explosionTime = INITIAL_EXPLOSION_TIME;
 }
 
 Cycle::~Cycle() {
@@ -90,12 +89,12 @@ int Cycle::getExplosionTime(){
     return explosionTime;
 }
 
-void Cycle::initExplosion(){
+void Cycle::initExplosion(float x, float y, float z){
     int i;
     for (i = 0; i < NUM_PARTICLES; i++){
-      particles[i].position[0] = 0.0;
-      particles[i].position[1] = 0.0;
-      particles[i].position[2] = 0.0;
+      particles[i].position[0] = x;
+      particles[i].position[1] = y;
+      particles[i].position[2] = z;
 
       particles[i].color[0] = 1.0;
       particles[i].color[1] = 1.0;
@@ -105,13 +104,13 @@ void Cycle::initExplosion(){
     }
 
     for (i = 0; i < NUM_DEBRIS; i++){
-      debris[i].position[0] = 0.0;
-      debris[i].position[1] = 0.0;
-      debris[i].position[2] = 0.0;
+      debris[i].position[0] = x;
+      debris[i].position[1] = y;
+      debris[i].position[2] = z;
 
-      debris[i].orientation[0] = 0.0;
-      debris[i].orientation[1] = 0.0;
-      debris[i].orientation[2] = 0.0;
+      debris[i].orientation[0] = x;
+      debris[i].orientation[1] = y;
+      debris[i].orientation[2] = z;
 
       debris[i].color[0] = 0.7;
       debris[i].color[1] = 0.7;

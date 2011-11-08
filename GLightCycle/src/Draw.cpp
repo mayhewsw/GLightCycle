@@ -303,6 +303,12 @@ void drawCycle(Cycle *c) {
 void drawExplosion(Cycle *c){
     int et = c->getExplosionTime();
 
+    // if the explosion hasn't happened yet
+    if (et == INITIAL_EXPLOSION_TIME){
+	Coords cCoords = c->getPos();				
+	c->initExplosion(cCoords.x, cCoords.y, cCoords.z);
+    }
+	
     cout << "ET: " << et << endl;
 
     if(et <= 0){
