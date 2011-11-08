@@ -8,9 +8,9 @@
 #include <vector>
 #include <math.h>
 #include "Draw.h"
-#include <GL.h>
-#include <glu.h>
-#include <glfw.h>
+//#include <GL.h>
+#include <GL/glu.h>
+#include <GL/glfw.h>
 
 int windowWidth = 1024;
 int windowHeight = 768;
