@@ -12,7 +12,7 @@
 using namespace std;
 
 Cycle::Cycle() {
-    explosionTime = 500;
+
 }
 
 Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
@@ -132,26 +132,26 @@ void Cycle::initExplosion(){
 
 void Cycle::newSpeed (float dest[3])
 {
-  float    x;
-  float    y;
-  float    z;
-  float    len;
-
-  x = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
-  y = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
-  z = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
-
-  len = sqrt (x * x + y * y + z * z);
-  
-  if (len){
-      x = x / len;
-      y = y / len;
-      z = z / len;
-  }
-  
-  dest[0] = x;
-  dest[1] = y;
-  dest[2] = z;
+    float    x;
+    float    y;
+    float    z;
+    float    len;
+    
+    x = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
+    y = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
+    z = (2.0 * ((float) rand ()) / ((float) RAND_MAX)) - 1.0;
+    
+    len = sqrt (x * x + y * y + z * z);
+    
+    if (len){
+	x = x / len;
+	y = y / len;
+	z = z / len;
+    }
+    
+    dest[0] = x;
+    dest[1] = y;
+    dest[2] = z;
 }
 
 void Cycle::updateExplosionDetails(){
@@ -162,35 +162,31 @@ void Cycle::updateExplosionDetails(){
 	particles[i].position[2] += particles[i].speed[2] * 0.2;
 	
 	particles[i].color[0] -= 1.0 / 500.0;
-	if (particles[i].color[0] < 0.0)
-	    {
-		particles[i].color[0] = 0.0;
-	    }
+	if (particles[i].color[0] < 0.0){
+	    particles[i].color[0] = 0.0;
+	}
 	
 	particles[i].color[1] -= 1.0 / 100.0;
-	if (particles[i].color[1] < 0.0)
-	    {
-		particles[i].color[1] = 0.0;
-	    }
+	if (particles[i].color[1] < 0.0){
+	    particles[i].color[1] = 0.0;
+	}
 	
 	particles[i].color[2] -= 1.0 / 50.0;
-	if (particles[i].color[2] < 0.0)
-	    {
-		particles[i].color[2] = 0.0;
-	    }
+	if (particles[i].color[2] < 0.0){
+	    particles[i].color[2] = 0.0;
+	}
     }
 
     
-    for (i = 0; i < NUM_DEBRIS; i++)
-	{
-	    debris[i].position[0] += debris[i].speed[0] * 0.1;
-	    debris[i].position[1] += debris[i].speed[1] * 0.1;
-	    debris[i].position[2] += debris[i].speed[2] * 0.1;
-	    
-	    debris[i].orientation[0] += debris[i].orientationSpeed[0] * 10;
-	    debris[i].orientation[1] += debris[i].orientationSpeed[1] * 10;
-	    debris[i].orientation[2] += debris[i].orientationSpeed[2] * 10;
-	}
+    for (i = 0; i < NUM_DEBRIS; i++){
+	debris[i].position[0] += debris[i].speed[0] * 0.1;
+	debris[i].position[1] += debris[i].speed[1] * 0.1;
+	debris[i].position[2] += debris[i].speed[2] * 0.1;
+	
+	debris[i].orientation[0] += debris[i].orientationSpeed[0] * 10;
+	debris[i].orientation[1] += debris[i].orientationSpeed[1] * 10;
+	debris[i].orientation[2] += debris[i].orientationSpeed[2] * 10;
+    }
 
     // decrement explosion time
     explosionTime -= 1;

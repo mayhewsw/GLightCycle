@@ -15,7 +15,7 @@ using namespace std;
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
-	World game = World(50, 50, 4);
+	World game = World(50, 50, 2);
 
 	/* GLFW initialization */
 	glfwInit();

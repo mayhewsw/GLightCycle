@@ -172,7 +172,7 @@ void drawWorld(World *state) {
 	    glPopMatrix();
 	    
 	    if (state->getCycles()[p].getIsDead()) {
-	    	drawExplosion(&(state->getCycles())[i]);
+	    	drawExplosion(&(state->getCycles())[p]);
 	    	continue;
 	    }
 	    
@@ -264,6 +264,9 @@ void drawCycle(Cycle *c) {
 	if (c->getIsDead()) {
 		return;
 	}
+
+	cout << c->getExplosionTime() << endl;
+
 	GLUquadricObj *sphere;
 	sphere = gluNewQuadric();
 	gluQuadricDrawStyle(sphere, GLU_FILL);
