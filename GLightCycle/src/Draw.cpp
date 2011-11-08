@@ -8,7 +8,7 @@
 #include <vector>
 #include <math.h>
 #include "Draw.h"
-#include <glfw.h>
+#include <GL/glfw.h>
 
 int windowWidth = 1024;
 int windowHeight = 768;
@@ -120,10 +120,7 @@ void drawWorld(World *state) {
 	int p;
 
 	for (p=0; p<state->getNumPlayers(); p++) {
-		if (state->getCycles()[p].getIsDead()) {
-			continue;
-		}
-		if (state->getNumPlayers() == 3) {
+	    if (state->getNumPlayers() == 3) {
 			if (p==2) {
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
@@ -170,6 +167,12 @@ void drawWorld(World *state) {
 			glTranslated(-state->height, 1.0, 0.0);
 		}
 		glPopMatrix();
+
+		if (state->getCycles()[p].getIsDead()) {
+		    drawExplosion(&(state->getCycles())[i]);
+		    continue;
+		}
+
 
 		for (i=0; i<state->getNumPlayers(); i++) {
 			drawTrail(&(state->getTrails())[i]);
@@ -290,6 +293,24 @@ void drawCycle(Cycle *c) {
 	gluSphere(sphere, 0.5, 15, 15);
 	glPopMatrix();
 }
+
+void drawExplosion(Cycle *c){
+    int et = c->getExplosionTime();
+
+    if(et <= 0){
+	return;
+    }
+
+    // draw particles going nuts
+
+
+
+    c->setExplosionTime(et-1);
+
+
+    
+}
+
 
 void drawItem(WorldItem *) {
 

@@ -18,5 +18,6 @@ void drawPlane();
 void drawTrail(Trail *);
 void drawCycle(Cycle *);
 void drawItem(WorldItem *);
+void drawExplosion(Cycle *);
 
 #endif /* DRAW_H_ */

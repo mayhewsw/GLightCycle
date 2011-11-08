@@ -16,6 +16,7 @@ class Cycle {
 	float speed;
 	int leftKey, rightKey;
 	bool isDead;
+	int explosionTime;
 public:
 	Cycle();
 	Cycle(Coords, float, int, int, int);
@@ -31,6 +32,8 @@ public:
 	int getRightKey();
 	bool getIsDead();
 	void setToDead();
+	void setExplosionTime(int);
+	int getExplosionTime();
 };
 
 #endif /* CYCLE_H_ */

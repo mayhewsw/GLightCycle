@@ -19,10 +19,11 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	lastPos = start;
 	direction = dir;
 	ID = color;
-	speed = 0.2;
+	speed = 0.05;
 	leftKey = left;
 	rightKey = right;
 	isDead = 0;
+	explosionTime = 500;
 }
 
 Cycle::~Cycle() {
@@ -72,4 +73,12 @@ bool Cycle::getIsDead() {
 
 void Cycle::setToDead() {
 	isDead = true;
+}
+
+void Cycle::setExplosionTime(int t){
+    explosionTime = t;
+}
+
+int Cycle::getExplosionTime(){
+    return explosionTime;
 }
