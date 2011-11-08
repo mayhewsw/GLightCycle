@@ -9,6 +9,32 @@
 #define CYCLE_H_
 #include "Coords.h"
 
+// Some of the ideas and code for the explosion effect was taken from
+// http://www.student.nada.kth.se/~nv91-gta/OpenGL/examples/explosion.html
+
+typedef struct particleData
+{
+  float   position[3];
+  float   speed[3];
+  float   color[3];
+} particleData;
+
+/* A piece of debris */
+
+typedef struct debrisData
+{
+  float   position[3];
+  float   speed[3];
+  float   orientation[3];        /* Rotation angles around x, y, and z axes */
+  float   orientationSpeed[3];
+  float   color[3];
+  float   scale[3];
+} debrisData;
+
+#define NUM_PARTICLES 1000
+#define NUM_DEBRIS 70
+
+
 class Cycle {
 	Coords pos, lastPos;
 	float direction;
@@ -17,6 +43,9 @@ class Cycle {
 	int leftKey, rightKey;
 	bool isDead;
 	int explosionTime;
+	particleData particles[NUM_PARTICLES];
+	debrisData   debris[NUM_DEBRIS]; 
+
 public:
 	Cycle();
 	Cycle(Coords, float, int, int, int);
@@ -34,6 +63,10 @@ public:
 	void setToDead();
 	void setExplosionTime(int);
 	int getExplosionTime();
+	
+	particleData *getParticles();
+	debrisData *getDebris();
+	
 };
 
 #endif /* CYCLE_H_ */

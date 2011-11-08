@@ -82,3 +82,11 @@ void Cycle::setExplosionTime(int t){
 int Cycle::getExplosionTime(){
     return explosionTime;
 }
+
+particleData *getParticles(){
+    return particles;
+}
+
+debrisData *getDebris(){
+    return debris;
+}
