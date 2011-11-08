@@ -46,6 +46,9 @@ class Cycle {
 	particleData particles[NUM_PARTICLES];
 	debrisData   debris[NUM_DEBRIS]; 
 
+	void initExplosion();
+	void newSpeed(float[]);
+
 public:
 	Cycle();
 	Cycle(Coords, float, int, int, int);
@@ -61,11 +64,12 @@ public:
 	int getRightKey();
 	bool getIsDead();
 	void setToDead();
-	void setExplosionTime(int);
 	int getExplosionTime();
+	void updateExplosionDetails();
 	
 	particleData *getParticles();
 	debrisData *getDebris();
+
 	
 };
 

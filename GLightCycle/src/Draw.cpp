@@ -7,8 +7,11 @@
 
 #include <vector>
 #include <math.h>
+#include <iostream>
 #include "Draw.h"
 #include <GL/glfw.h>
+
+using namespace std;
 
 int windowWidth = 1024;
 int windowHeight = 768;
@@ -121,65 +124,65 @@ void drawWorld(World *state) {
 
 	for (p=0; p<state->getNumPlayers(); p++) {
 	    if (state->getNumPlayers() == 3) {
-			if (p==2) {
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-				gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
-				glMatrixMode(GL_MODELVIEW);
-			}
+		if (p==2) {
+		    glMatrixMode(GL_PROJECTION);
+		    glLoadIdentity();
+		    gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
+		    glMatrixMode(GL_MODELVIEW);
 		}
-		Cycle player = state->getCycles()[p];
-
-		// Calculate the camera position
-		GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(player.getDirection()
-				* DEG_TO_RAD), player.getPos().y - 6
-				* sin(player.getDirection() * DEG_TO_RAD), 3.0 };
-
-		// Calculate the camera's direction
-		GLfloat camera_dir[3] = {
-				player.getPos().x + cos(player.getDirection() * DEG_TO_RAD), player.getPos().y
-						+ sin(player.getDirection() * DEG_TO_RAD), 0.0 };
-
-
-		glViewport(viewports[p][0], viewports[p][1],
-				viewports[p][2], viewports[p][3]);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		gluLookAt(camera_pos[0], camera_pos[1], camera_pos[2],
-				  camera_dir[0], camera_dir[1], camera_dir[2],
-				  0, 0, 1);
-
-
-		int i, j;
-		GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
-
-		glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-
-		glPushMatrix();
-
-		for (i=0; i<state->width; i++) {
-			for (j=0; j<state->height; j++) {
-				drawPlane();
-				glTranslated(1.0, 0.0, 0.0);
-			}
-			glTranslated(-state->height, 1.0, 0.0);
+	    }
+	    Cycle player = state->getCycles()[p];
+	    
+	    // Calculate the camera position
+	    GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(player.getDirection()
+								  * DEG_TO_RAD), player.getPos().y - 6
+				      * sin(player.getDirection() * DEG_TO_RAD), 3.0 };
+	    
+	    // Calculate the camera's direction
+	    GLfloat camera_dir[3] = {
+		player.getPos().x + cos(player.getDirection() * DEG_TO_RAD), player.getPos().y
+		+ sin(player.getDirection() * DEG_TO_RAD), 0.0 };
+	    
+	    
+	    glViewport(viewports[p][0], viewports[p][1],
+		       viewports[p][2], viewports[p][3]);
+	    
+	    glMatrixMode(GL_MODELVIEW);
+	    glLoadIdentity();
+	    
+	    gluLookAt(camera_pos[0], camera_pos[1], camera_pos[2],
+		      camera_dir[0], camera_dir[1], camera_dir[2],
+		      0, 0, 1);
+	    
+	    
+	    int i, j;
+	    GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
+	    
+	    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+	    
+	    glPushMatrix();
+	    
+	    for (i=0; i<state->width; i++) {
+		for (j=0; j<state->height; j++) {
+		    drawPlane();
+		    glTranslated(1.0, 0.0, 0.0);
 		}
-		glPopMatrix();
-
-		if (state->getCycles()[p].getIsDead()) {
-		    drawExplosion(&(state->getCycles())[i]);
-		    continue;
-		}
-
-
-		for (i=0; i<state->getNumPlayers(); i++) {
-			drawTrail(&(state->getTrails())[i]);
-			drawCycle(&(state->getCycles())[i]);
-		}
+		glTranslated(-state->height, 1.0, 0.0);
+	    }
+	    glPopMatrix();
+	    
+	    if (state->getCycles()[p].getIsDead()) {
+	    	drawExplosion(&(state->getCycles())[i]);
+	    	continue;
+	    }
+	    
+	    
+	    for (i=0; i<state->getNumPlayers(); i++) {
+		drawTrail(&(state->getTrails())[i]);
+		drawCycle(&(state->getCycles())[i]);
+	    }
 	}
-
+	
 	glfwSwapBuffers();
 }
 
@@ -297,16 +300,64 @@ void drawCycle(Cycle *c) {
 void drawExplosion(Cycle *c){
     int et = c->getExplosionTime();
 
+    cout << "ET: " << et << endl;
+
     if(et <= 0){
 	return;
     }
-4
+
     // draw particles going nuts
+    glPushMatrix ();
     
-
-
-    c->setExplosionTime(et-1);
-
+    glDisable (GL_LIGHTING);
+    glDisable (GL_DEPTH_TEST);
+    
+    glBegin (GL_POINTS);
+    
+    int i;
+    for (i = 0; i < NUM_PARTICLES; i++){
+	glColor3fv (c->getParticles()[i].color);
+	glVertex3fv (c->getParticles()[i].position);
+    }
+    
+    glEnd ();
+    
+    glPopMatrix ();
+    
+    glEnable (GL_LIGHTING); 
+    glEnable (GL_LIGHT0); 
+    glEnable (GL_DEPTH_TEST);
+    
+    glNormal3f (0.0, 0.0, 1.0);
+    
+    for (i = 0; i < NUM_DEBRIS; i++){
+	glColor3fv (c->getDebris()[i].color);
+	
+	glPushMatrix ();
+	
+	glTranslatef (c->getDebris()[i].position[0],
+		      c->getDebris()[i].position[1],
+		      c->getDebris()[i].position[2]);
+	
+	glRotatef (c->getDebris()[i].orientation[0], 1.0, 0.0, 0.0);
+	glRotatef (c->getDebris()[i].orientation[1], 0.0, 1.0, 0.0);
+	glRotatef (c->getDebris()[i].orientation[2], 0.0, 0.0, 1.0);
+	
+	glScalef (c->getDebris()[i].scale[0],
+		  c->getDebris()[i].scale[1],
+		  c->getDebris()[i].scale[2]);
+	
+	glBegin (GL_TRIANGLES);
+	glVertex3f (0.0, 0.5, 0.0);
+	glVertex3f (-0.25, 0.0, 0.0);
+	glVertex3f (0.25, 0.0, 0.0);
+	glEnd ();	  
+	
+	glPopMatrix ();
+    }
+    
+    c->updateExplosionDetails();
+    
 
     
 }
