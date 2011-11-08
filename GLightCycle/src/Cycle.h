@@ -71,7 +71,7 @@ public:
 	particleData *getParticles();
 	debrisData *getDebris();
 	
-	void initExplosion(int, int, int);
+	void initExplosion(float, float, float);
 
 };
 

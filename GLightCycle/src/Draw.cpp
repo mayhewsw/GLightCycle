@@ -265,7 +265,7 @@ void drawCycle(Cycle *c) {
 		return;
 	}
 
-	cout << c->getExplosionTime() << endl;
+	//cout << c->getExplosionTime() << endl;
 
 	GLUquadricObj *sphere;
 	sphere = gluNewQuadric();
@@ -309,7 +309,7 @@ void drawExplosion(Cycle *c){
 	c->initExplosion(cCoords.x, cCoords.y, cCoords.z);
     }
 	
-    cout << "ET: " << et << endl;
+    //    cout << "ET: " << et << endl;
 
     if(et <= 0){
 	return;
