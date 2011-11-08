@@ -25,6 +25,8 @@ public:
 	virtual ~World();
 	void move();
 	void turn(Cycle *);
+	bool isValidMove(Cycle);
+	void kill(Cycle *);
 	Cycle *getCycles();
 	std::vector<WorldItem> getItems();
 	int getNumPlayers();

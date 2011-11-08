@@ -10,6 +10,7 @@
 #include "Trail.h"
 #include "World.h"
 #include "Coords.h"
+#include "Draw.h"
 #include <iostream>
 #include <GL/glfw.h>
 using namespace std;
@@ -44,6 +45,9 @@ void World::move() {
 	Coords newPos;
 
 	for (i=0; i<numPlayers; i++) {
+		if (cycles[i].getIsDead()) {
+			continue;
+		}
 		currentCycle = cycles[i];
 		currentTrail = trails[i];
 		turn(&currentCycle);
@@ -57,8 +61,14 @@ void World::move() {
 
 		currentTrail.addPoint(newPos);
 
-		cycles[i] = currentCycle;
 		trails[i] = currentTrail;
+
+		if (!isValidMove(currentCycle)) {
+			kill(&currentCycle);
+		}
+
+		cycles[i] = currentCycle;
+
 	}
 }
 
@@ -77,6 +87,24 @@ void World::turn(Cycle *c) {
 	} else if (c->getDirection() < -360) {
 		c->setDirection(c->getDirection() + 360);
 	}
+}
+
+bool World::isValidMove(Cycle c) {
+	Coords pos = c.getPos();
+
+	if (pos.x < 0 || pos.x > width || pos.y < 0 || pos.y > height) {
+		return false;
+	}
+
+	return true;
+}
+
+void World::kill(Cycle *c) {
+	int ID = c->getID();
+	cout << trails[ID].getPoints()->size() << endl;
+	trails[ID].clear();
+	cout << trails[ID].getPoints()->size() << endl;
+	c->setToDead();
 }
 
 Cycle *World::getCycles() {

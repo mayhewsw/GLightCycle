@@ -19,7 +19,9 @@ public:
 	Trail(Coords, int);
 	virtual ~Trail();
 	void addPoint(Coords);
-	std::vector<Coords> getPoints();
+	std::vector<Coords> *getPoints();
+	void setPoints(std::vector<Coords>);
+	void clear();
 	int getID();
 };
 

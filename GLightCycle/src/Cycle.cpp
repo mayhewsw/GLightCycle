@@ -22,6 +22,7 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	speed = 0.2;
 	leftKey = left;
 	rightKey = right;
+	isDead = 0;
 }
 
 Cycle::~Cycle() {
@@ -63,4 +64,12 @@ int Cycle::getLeftKey() {
 
 int Cycle::getRightKey() {
 	return rightKey;
+}
+
+bool Cycle::getIsDead() {
+	return isDead;
+}
+
+void Cycle::setToDead() {
+	isDead = true;
 }
