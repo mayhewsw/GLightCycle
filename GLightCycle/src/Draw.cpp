@@ -6,15 +6,19 @@
  */
 
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include "Draw.h"
+#include <cstdlib>
+#include <GL/glew.h>
 #include <GL/glfw.h>
 
 using namespace std;
 
 int windowWidth = 1024;
 int windowHeight = 768;
+
+GLuint groundTexture, glowTexture;
 
 void init() {
 	int r_bits =8, g_bits = 8, b_bits = 8, a_bits=8;
@@ -50,6 +54,47 @@ void init() {
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LEQUAL);
+
+	generateGround();
+}
+
+void generateGround() {
+	GLbyte *data, *p;
+	int texSize = 32;
+
+	data = (GLbyte *)malloc(texSize * texSize * 4);
+
+	int i, j;
+	p = data;
+	for (i=0; i<texSize; i++) {
+		for (j=0; j<texSize; j++) {
+			if (i==0 || i == (texSize-1) || j==0 || j == (texSize-1)) {
+				p[0] = 0;
+				p[1] = 255;
+				p[2] = 255;
+				p[3] = 255;
+			} else {
+				p[0] = 0;
+				p[1] = 0;
+				p[2] = 0;
+				p[3] = 0;
+			}
+			p+=4;
+		}
+	}
+
+	glGenTextures(1, &groundTexture);
+	glBindTexture(GL_TEXTURE_2D, groundTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSize, texSize, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			data);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, texSize, texSize, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+	free(data);
 }
 
 void drawWorld(World *state) {
@@ -160,17 +205,38 @@ void drawWorld(World *state) {
 	    
 	    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 	    
-	    glPushMatrix();
+//	    glPushMatrix();
+//
+//	    for (i=0; i<state->width; i++) {
+//		for (j=0; j<state->height; j++) {
+//		    drawPlane();
+//		    glTranslated(1.0, 0.0, 0.0);
+//		}
+//		glTranslated(-state->height, 1.0, 0.0);
+//	    }
+//	    glPopMatrix();
 	    
-	    for (i=0; i<state->width; i++) {
-		for (j=0; j<state->height; j++) {
-		    drawPlane();
-		    glTranslated(1.0, 0.0, 0.0);
+	    glEnable(GL_TEXTURE_2D);
+	    glDisable(GL_LIGHTING);
+		glBindTexture(GL_TEXTURE_2D, groundTexture);
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(0.0, 0.0);
+			glVertex3f(0.0, 0.0, 0.0);
+
+			glTexCoord2f(0.0, state->height);
+			glVertex3f(0.0, state->height, 0.0);
+
+			glTexCoord2f(state->width, state->height);
+			glVertex3f(state->width, state->height, 0.0);
+
+			glTexCoord2f(state->width, 0.0);
+			glVertex3f(state->width, 0.0, 0.0);
 		}
-		glTranslated(-state->height, 1.0, 0.0);
-	    }
-	    glPopMatrix();
-	    
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glEnable(GL_LIGHTING);
+
 	    if (state->getCycles()[p].getIsDead()) {
 	    	drawExplosion(&(state->getCycles())[p]);
 	    	continue;
@@ -184,35 +250,6 @@ void drawWorld(World *state) {
 	}
 	
 	glfwSwapBuffers();
-}
-
-void drawPlane() {
-	GLfloat grid_vertex[][3] = { {0.0, 0.0, 0.0},
-								 {1.0, 0.0, 0.0},
-								 {1.0, 1.0, 0.0},
-								 {0.0, 1.0, 0.0}
-								};
-
-	GLfloat grid_specular[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat grid_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat grid_ambient[] = { 0.1, 0.1, 0.1, 0.0 };
-	GLfloat grid_emissive[] = { 0.1, 1.0, 1.0, 0.0 };
-	GLfloat grid_shininess = 0.0;
-
-	glMaterialfv(GL_FRONT, GL_SPECULAR, grid_specular);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, grid_diffuse);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, grid_ambient);
-	glMaterialfv(GL_FRONT, GL_EMISSION, grid_emissive);
-	glMaterialf(GL_FRONT, GL_SHININESS, grid_shininess);
-
-	glBegin(GL_LINE_LOOP);
-	{
-		glVertex3fv(grid_vertex[0]);
-		glVertex3fv(grid_vertex[1]);
-		glVertex3fv(grid_vertex[2]);
-		glVertex3fv(grid_vertex[3]);
-	}
-	glEnd();
 }
 
 void drawTrail(Trail *t) {
