@@ -27,6 +27,9 @@ const char *fShader2 = "shaders/gaussianVert.frag";
 static GLint horizBlur = 0;
 static GLint vertBlur = 0;
 
+// The sample size for the post-processing
+static int glowSize = 256;
+
 void initUniformParameters() {
 	glUniform1i(glGetUniformLocation(horizBlur, "texSize"), glowSize);
 	glUniform1i(glGetUniformLocation(vertBlur, "texSize"), glowSize);
@@ -78,7 +81,7 @@ void init() {
 	generateGround();
 
 	// Allocate and empty texture used for post-processing
-	glowTexture = EmptyTexture();
+	glowTexture = EmptyTexture(glowSize, glowSize);
 
 	// Initialize the shaders
 	shaderInit();
@@ -96,7 +99,7 @@ void init() {
 
 /**
  * Generate the ground texture
- * It is essentially Cyan around the edges and black elsewhere
+ * It is Cyan around the edges and black elsewhere
  */
 void generateGround() {
 	GLbyte *data, *p;
@@ -616,6 +619,8 @@ void render(World *state) {
 	windowWidth = glowSize;
 	windowHeight = glowSize;
 
+	glDisable(GL_LIGHTING);
+
 	// Draw and render to texture
 	drawWorld(state);
 	RenderToTexture();
@@ -636,12 +641,16 @@ void render(World *state) {
 	windowWidth = tempWidth;
 	windowHeight = tempHeight;
 
+	glEnable(GL_LIGHTING);
+
 	// Draw the final product
 	glUseProgram(0);
 	drawWorld(state);
+
+	glViewport(0, 0, windowWidth, windowHeight);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
-	glViewport(0, 0, windowWidth, windowHeight);
 	drawTexture(glowTexture);
 	glDisable(GL_BLEND);
 

@@ -10,11 +10,8 @@
 
 #include <GL/glew.h>
 
-// The sample size for the post-processing
-static int glowSize = 256;
-
 void shaderInit();
-GLuint EmptyTexture();
+GLuint EmptyTexture(int, int);
 const char *readShaderSource(const char*);
 void checkError(GLint, const char *);
 void initShader(const GLchar*, const GLchar*, GLint *);

@@ -21,15 +21,15 @@ using namespace std;
  * Initializes and empty texture
  * (so we can dump a scene into it)
  */
-GLuint EmptyTexture() {
+GLuint EmptyTexture(int texWidth, int texHeight) {
 	GLuint txtnumber;
 	unsigned char *data;
 
-	data = (unsigned char *) malloc(glowSize * glowSize * 4);
+	data = (unsigned char *) malloc(texWidth * texHeight * 4);
 
 	glGenTextures(1, &txtnumber);
 	glBindTexture(GL_TEXTURE_2D, txtnumber);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glowSize, glowSize, 0, GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA,
 			GL_UNSIGNED_BYTE, data);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
