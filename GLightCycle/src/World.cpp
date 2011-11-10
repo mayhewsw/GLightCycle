@@ -70,6 +70,7 @@ void World::move() {
 		cycles[i] = currentCycle;
 
 	}
+	trailDetect();
 }
 
 void World::turn(Cycle *c) {
@@ -97,6 +98,61 @@ bool World::isValidMove(Cycle c) {
 	}
 
 	return true;
+}
+
+
+void World::trailDetect(){
+
+	unsigned int i, j;
+	for (j = 0; j < numPlayers; j++) {
+		if (!cycles[j].getIsDead()) {
+			unsigned int f = trails[j].getPoints()->size() - 1;
+			for (i = 1; i < f; i = i+1) {
+				if (!cycles[0].getIsDead() && intersection( cycles[0].getLastPos(), cycles[0].getPos(),
+						trails[j].points[i], trails[j].points[i + 1])) {
+					kill(&cycles[0]);
+				}
+				if (numPlayers > 1 && !cycles[1].getIsDead() && intersection(
+						cycles[1].getLastPos(), cycles[1].getPos(),
+						trails[j].points[i], trails[j].points[i + 1])) {
+					kill(&cycles[1]);
+				}
+				if (numPlayers > 2 && !cycles[2].getIsDead() && intersection(
+						cycles[2].getLastPos(), cycles[2].getPos(),
+						trails[j].points[i], trails[j].points[i + 1])) {
+					kill(&cycles[2]);
+				}
+				if (numPlayers > 3 && !cycles[3].getIsDead() && intersection(
+						cycles[3].getLastPos(), cycles[3].getPos(),
+						trails[j].points[i], trails[j].points[i + 1])) {
+					kill(&cycles[3]);
+				}
+
+			}
+		}
+	}
+
+
+}
+
+bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
+	float ax = a.x;
+	float ay = a.y;
+	float bx = b.x;
+	float by = b.y;
+	float cx = c.x;
+	float cy = c.y;
+	float dx = d.x;
+	float dy = d.y;
+	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
+	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
+			* cy))) / denom;
+	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
+			* ay)) / denom;
+	if (i > .01 && i < .99 && j > .01 && j < .99)
+		return true;
+	return false;
+
 }
 
 void World::kill(Cycle *c) {

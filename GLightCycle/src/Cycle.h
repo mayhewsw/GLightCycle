@@ -55,6 +55,7 @@ public:
 	Cycle(Coords, float, int, int, int);
 	virtual ~Cycle();
 	Coords getPos();
+	Coords getLastPos();
 	void setPos(Coords);
 	float getDirection();
 	void setDirection(float);

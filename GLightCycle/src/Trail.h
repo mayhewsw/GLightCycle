@@ -12,9 +12,10 @@
 #include <vector>
 
 class Trail {
-	std::vector<Coords> points;
+
 	int ID;
 public:
+	std::vector<Coords> points;
 	Trail();
 	Trail(Coords, int);
 	virtual ~Trail();

@@ -36,6 +36,12 @@ Coords Cycle::getPos() {
 	return pos;
 }
 
+Coords Cycle::getLastPos() {
+
+	return lastPos;
+}
+
+
 void Cycle::setPos(Coords newPos) {
 	lastPos = pos;
 	pos = newPos;
