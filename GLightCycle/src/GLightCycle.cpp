@@ -15,13 +15,24 @@ using namespace std;
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
-	World game = World(50, 50, 2);
+	unsigned int numplay = 3;
+
+	cout << "Enter number of players : " << endl;
+//	cin >> numplay;
+
+
+	World game = World(50, 50, numplay);
 
 	/* GLFW initialization */
 	glfwInit();
 	init();
 
 	int running = GL_TRUE;
+	long counter = 100;
+
+	for (long i = 0; i < counter; i++){
+		drawWorld(&game);
+	}
 
 	while (running) {
 		drawWorld(&game);
