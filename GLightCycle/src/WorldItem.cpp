@@ -29,9 +29,9 @@ void WorldItem::timer() {
 	int t = (int) difftime(time(NULL), seconds);
 	cout << t << endl;
 	if (t > SPAWN) {
-		cout << "Active now" << endl;
 		active = true;
 	}
+
 }
 
 bool WorldItem::getActive(){

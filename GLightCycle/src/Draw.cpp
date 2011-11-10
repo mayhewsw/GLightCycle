@@ -23,15 +23,13 @@ const char *fShader2 = "shaders/gaussianVert.frag";
 static GLint horizBlur = 0;
 static GLint vertBlur = 0;
 
-
 void initUniformParameters() {
 	glUniform1i(glGetUniformLocation(horizBlur, "texSize"), glowSize);
 	glUniform1i(glGetUniformLocation(vertBlur, "texSize"), glowSize);
 }
 
-
-int windowWidth = 800;
-int windowHeight = 800;
+int windowWidth = 900;
+int windowHeight = 900;
 
 GLuint groundTexture, glowTexture;
 
@@ -116,7 +114,8 @@ void generateGround() {
 	glBindTexture(GL_TEXTURE_2D, groundTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSize, texSize, 0, GL_RGBA,
 			GL_UNSIGNED_BYTE, data);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -198,18 +197,21 @@ void drawWorld(World *state, bool Glow) {
 
 	int p;
 
-	for (p=0; p<state->getNumPlayers(); p++) {
-	    if (state->getNumPlayers() == 3) {
-			if (p==2) {
+	for (p = 0; p < state->getNumPlayers(); p++) {
+		if (state->getNumPlayers() == 3) {
+			if (p == 2) {
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
+				gluPerspective(60.0,
+						(float) (windowWidth) / (windowHeight / 2), 0.1, 200);
 				glMatrixMode(GL_MODELVIEW);
 			}
+		}
+
 		Cycle player = state->getCycles()[p];
-	    if (player.getExplosionTime() == 0) {
-	    	continue;
-	    }
+		if (player.getExplosionTime() == 0) {
+			continue;
+		}
 
 		// Calculate the camera position
 		GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(
@@ -230,11 +232,10 @@ void drawWorld(World *state, bool Glow) {
 		gluLookAt(camera_pos[0], camera_pos[1], camera_pos[2], camera_dir[0],
 				camera_dir[1], camera_dir[2], 0, 0, 1);
 
-
+		int i;
+		GLfloat light0_position[4] = { state->width / 2, state->height / 2,
+				10.0, 0.0 };
 		glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-
-	    int i;
-	    GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
 
 		glEnable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
@@ -260,8 +261,7 @@ void drawWorld(World *state, bool Glow) {
 		WorldItem *w = state->getItems();
 		for (i = 0; i < 3; i++) {
 
-			if(w[i].getActive()){
-				cout << "Being drawn..." << endl;
+			if (w[i].getActive()) {
 				drawItem(&(state->getItems())[i]);
 			}
 		}
@@ -282,21 +282,21 @@ void drawItem(WorldItem *w) {
 	GLfloat item_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat item_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat item_shininess = 0.0;
-	float r = 0.1, g = 0.1, b = 0.1, a = 0.1;
+	float r = 0.1, g = 0.1, b = 0.1, a = 0.0;
 
 	if (w->getID() == 0) { // kills you
-		r = 106/255.0;
-		g = 90/255.0;
-		b = 205/255.0;
+		r = 106 / 255.0;
+		g = 40 / 255.0;
+		b = 205 / 255.0;
 
 	} else if (w->getID() == 1) { // slower
-		r = 34/255.0;
-		g = 139/255.0;
-		b = 34/255.0;
+		r = 34 / 255.0;
+		g = 139 / 255.0;
+		b = 34 / 255.0;
 	} else if (w->getID() == 2) { // faster
-		r = 178/255.0;
-		g = 34/255.0;
-		b = 34/255.0;
+		r = 178 / 255.0;
+		g = 34 / 255.0;
+		b = 34 / 255.0;
 	}
 
 	GLfloat item_ambient[] = { r, g, b, a };
@@ -314,7 +314,6 @@ void drawItem(WorldItem *w) {
 
 	int height = 1;
 
-
 	glPushMatrix();
 
 	glTranslatef(w->getPos().x, w->getPos().y, 0);
@@ -330,7 +329,7 @@ void drawTrail(Trail *t) {
 	GLfloat trail_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_shininess = 0.0;
-	float r=0.1,g=0.1,b=0.1,a=1.0;
+	float r = 0.1, g = 0.1, b = 0.1, a = 1.0;
 
 	if (t->getID() == 0) {
 		r = 1.0;
@@ -380,7 +379,7 @@ void drawCycle(Cycle *c) {
 
 	GLfloat cycle_specular[] = { 1.0, 1.0, 1.0, 0.0 };
 	GLfloat cycle_shininess = 128.0;
-	float r=0.1,g=0.1,b=0.1,a=0.0;
+	float r = 0.1, g = 0.1, b = 0.1, a = 0.0;
 
 	if (c->getID() == 0) {
 		r = 1.0;
@@ -480,13 +479,13 @@ void drawExplosion(Cycle *c) {
 }
 
 static void toOrtho() {
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 }
 
 static void toPerspective() {
@@ -535,10 +534,6 @@ void drawTexture(GLint tex) {
 	glEnable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void drawItem(WorldItem *) {
-
 }
 
 void render(World *state) {

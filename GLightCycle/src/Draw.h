@@ -21,10 +21,7 @@ void drawTrail(Trail *);
 void drawCycle(Cycle *);
 void drawItem(WorldItem *);
 void drawExplosion(Cycle *);
-<<<<<<< HEAD
 void drawItem(WorldItem *);
-=======
 void render(World *);
 
->>>>>>> 481793e42af2474af93cb449cec0d5041fd146b3
 #endif /* DRAW_H_ */
