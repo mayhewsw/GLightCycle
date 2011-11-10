@@ -1,6 +1,8 @@
 /*
  * Shader.cpp
  *
+ * Initializes all of the shader details
+ *
  *  Created on: Nov 9, 2011
  *      Author: kimsj
  */
@@ -15,6 +17,10 @@
 
 using namespace std;
 
+/**
+ * Initializes and empty texture
+ * (so we can dump a scene into it)
+ */
 GLuint EmptyTexture() {
 	GLuint txtnumber;
 	unsigned char *data;
@@ -103,6 +109,9 @@ void initShader(const GLchar* vShaderFile, const GLchar* fShaderFile,
 	checkError(status, "Failed to link the shader program object.");
 }
 
+/**
+ * Sets up GLEW
+ */
 void shaderInit() {
 	GLenum err;
 	err = glewInit();

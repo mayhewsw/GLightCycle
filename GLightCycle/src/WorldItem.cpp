@@ -1,6 +1,8 @@
 /*
  * WorldItem.cpp
  *
+ * Represents an item in the world
+ *
  *  Created on: Oct 28, 2011
  *      Author: kimsj
  */
@@ -25,6 +27,9 @@ WorldItem::~WorldItem() {
 	// TODO Auto-generated destructor stub
 }
 
+/**
+ * Updates the timer, so it knows when to spawn
+ */
 void WorldItem::timer() {
 	int t = (int) difftime(time(NULL), seconds);
 

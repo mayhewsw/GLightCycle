@@ -1,6 +1,8 @@
 /*
  * Draw.cpp
  *
+ * Manages all of the rendering in the game
+ *
  *  Created on: Oct 30, 2011
  *      Author: kimsj
  */
@@ -21,6 +23,7 @@ const char *vShader = "shaders/gaussian.vert";
 const char *fShader1 = "shaders/gaussianHoriz.frag";
 const char *fShader2 = "shaders/gaussianVert.frag";
 
+// Program IDs for the shaders
 static GLint horizBlur = 0;
 static GLint vertBlur = 0;
 
@@ -29,12 +32,15 @@ void initUniformParameters() {
 	glUniform1i(glGetUniformLocation(vertBlur, "texSize"), glowSize);
 }
 
+// Size of the actual window
 int windowWidth = 900;
 int windowHeight = 900;
 
+// Texture IDs
 GLuint groundTexture, glowTexture;
 
 void init() {
+	// Specify each of the pixel bits
 	int r_bits = 8, g_bits = 8, b_bits = 8, a_bits = 8;
 	int depth_bits = 16;
 	int stencil_bits = 0;
@@ -68,16 +74,18 @@ void init() {
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LEQUAL);
 
+	// Generate the ground texture
 	generateGround();
+
+	// Allocate and empty texture used for post-processing
 	glowTexture = EmptyTexture();
 
+	// Initialize the shaders
 	shaderInit();
 
 	initShader(vShader, fShader1, &horizBlur);
 	glUseProgram(horizBlur);
 	initUniformParameters();
-
-	glUseProgram(0);
 
 	initShader(vShader, fShader2, &vertBlur);
 	glUseProgram(vertBlur);
@@ -86,6 +94,10 @@ void init() {
 	glUseProgram(0);
 }
 
+/**
+ * Generate the ground texture
+ * It is essentially Cyan around the edges and black elsewhere
+ */
 void generateGround() {
 	GLbyte *data, *p;
 	int texSize = 32;
@@ -127,11 +139,18 @@ void generateGround() {
 	free(data);
 }
 
-void drawWorld(World *state, bool Glow) {
+/**
+ * Renders the entire world. This includes setting up the viewports for each player,
+ * drawing the ground, cycles, trails, and items
+ */
+void drawWorld(World *state) {
 	int viewports[4][4];
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+
+	// Set up all the different viewports for each case
+	// Not the most elegant way of doing it...
 	if (state->getNumPlayers() == 1) {
 		viewports[0][0] = 0;
 		viewports[0][1] = 0;
@@ -198,7 +217,11 @@ void drawWorld(World *state, bool Glow) {
 
 	int p;
 
+	// Render the scene for each player
 	for (p = 0; p < state->getNumPlayers(); p++) {
+
+		// In the 3 player case, the third player has a different
+		// viewing window, so we need to adjust his/her projection
 		if (state->getNumPlayers() == 3) {
 			if (p == 2) {
 				glMatrixMode(GL_PROJECTION);
@@ -209,6 +232,8 @@ void drawWorld(World *state, bool Glow) {
 			}
 		}
 
+		// If the player has exploded, don't draw
+		// anything for him/her anymore
 		Cycle player = state->getCycles()[p];
 		if (player.getExplosionTime() == 0) {
 			continue;
@@ -238,6 +263,7 @@ void drawWorld(World *state, bool Glow) {
 				10.0, 0.0 };
 		glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
+		// Draw the ground (one big quad that is textured)
 		glEnable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
 		glBindTexture(GL_TEXTURE_2D, groundTexture);
@@ -259,6 +285,7 @@ void drawWorld(World *state, bool Glow) {
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_LIGHTING);
 
+		// Draw each item
 		WorldItem *w = state->getItems();
 		for (i = 0; i < 3; i++) {
 
@@ -267,6 +294,7 @@ void drawWorld(World *state, bool Glow) {
 			}
 		}
 
+		// Draw the trails, cycles, and possibly explosions
 		for (i = 0; i < state->getNumPlayers(); i++) {
 			// This order so that the explosions are the right color
 			drawTrail(&(state->getTrails())[i]);
@@ -279,6 +307,9 @@ void drawWorld(World *state, bool Glow) {
 	}
 }
 
+/**
+ * This draws one of the items that exist in the world
+ */
 void drawItem(WorldItem *w) {
 	GLfloat item_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat item_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -323,21 +354,21 @@ void drawItem(WorldItem *w) {
 		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
 		glTranslatef(0, 0, height);
 		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
-	} else if (w->getID() == 1) { // slower
+	} else if (w->getID() == 1) { // slower, a cone
 		gluCylinder(quadric, ITEM_RADIUS, 0, height, 15, 15);
 		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
 	} else if (w->getID() == 2) { // faster
-		glScalef(0.5,0.5,0.5);
-		glTranslatef(0,0,1);
+		glScalef(0.5, 0.5, 0.5);
+		glTranslatef(0, 0, 1);
 		glutSolidDodecahedron();
 	}
-
-
-
 
 	glPopMatrix();
 }
 
+/**
+ * This draws the trails belonging to a particular player
+ */
 void drawTrail(Trail *t) {
 	GLfloat trail_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -383,9 +414,10 @@ void drawTrail(Trail *t) {
 	}
 }
 
+/**
+ * Draws a player
+ */
 void drawCycle(Cycle *c) {
-	//cout << c->getExplosionTime() << endl;
-
 	GLUquadricObj *sphere;
 	sphere = gluNewQuadric();
 	gluQuadricDrawStyle(sphere, GLU_FILL);
@@ -425,6 +457,9 @@ void drawCycle(Cycle *c) {
 	glPopMatrix();
 }
 
+/**
+ * Draws an explosion
+ */
 void drawExplosion(Cycle *c) {
 	int et = c->getExplosionTime();
 
@@ -491,6 +526,10 @@ void drawExplosion(Cycle *c) {
 	c->updateExplosionDetails();
 }
 
+/**
+ * Sets up an orthoganol projection, so we can easily
+ * place a texture in front of the screen
+ */
 static void toOrtho() {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -501,6 +540,9 @@ static void toOrtho() {
 	glLoadIdentity();
 }
 
+/**
+ * Undoes what the toOrtho method does
+ */
 static void toPerspective() {
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -508,6 +550,11 @@ static void toPerspective() {
 	glPopMatrix();
 }
 
+/**
+ * Takes the image in the back buffer and dumps
+ * it to a texture.
+ * Note: this also clears the back buffer
+ */
 void RenderToTexture() {
 	glBindTexture(GL_TEXTURE_2D, glowTexture);
 
@@ -516,6 +563,9 @@ void RenderToTexture() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/**
+ * Given a texture, it will place it directly in front of the screen.
+ */
 void drawTexture(GLint tex) {
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
@@ -549,30 +599,46 @@ void drawTexture(GLint tex) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+/**
+ * Controls the post-processing blur effect.
+ * First, it downsamples the view (since we're blurring it anyways)
+ * Then it'll render it to a texture.
+ * It'll draw the texture, with a horizontal blur applied, and then render that to a texture
+ * It'll repeat the last step, but with a vertical blur
+ * Lastly, it'll draw the scene normally, then apply the texture using additive alpha blending
+ */
 void render(World *state) {
+	// Keep track of the original window dimensions
 	int tempWidth = windowWidth;
 	int tempHeight = windowHeight;
 
+	// Set the window dimensions to the downsampled size
 	windowWidth = glowSize;
 	windowHeight = glowSize;
 
-	drawWorld(state, true);
+	// Draw and render to texture
+	drawWorld(state);
 	RenderToTexture();
 
+	// Make sure the viewport is correct (since drawWorld messes with it)
+	// and draw with horizontal blur
 	glViewport(0, 0, glowSize, glowSize);
 	glUseProgram(horizBlur);
 	drawTexture(glowTexture);
 	RenderToTexture();
 
+	// Draw with vertical blur
 	glUseProgram(vertBlur);
 	drawTexture(glowTexture);
 	RenderToTexture();
 
+	// Reset the window dimensions
 	windowWidth = tempWidth;
 	windowHeight = tempHeight;
 
+	// Draw the final product
 	glUseProgram(0);
-	drawWorld(state, false);
+	drawWorld(state);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glViewport(0, 0, windowWidth, windowHeight);

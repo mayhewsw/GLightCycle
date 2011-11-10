@@ -10,6 +10,7 @@
 
 #include <GL/glew.h>
 
+// The sample size for the post-processing
 static int glowSize = 256;
 
 void shaderInit();

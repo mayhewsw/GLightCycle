@@ -1,6 +1,11 @@
 /*
  * World.cpp
  *
+ * Represents the world as a whole.
+ * Also acts as a "manager" of sorts, handling
+ * cycle movement, item generation, and collision
+ * detection
+ *
  *  Created on: Oct 26, 2011
  *      Author: kimsj
  */
@@ -17,6 +22,9 @@ using namespace std;
 
 #define DEG_TO_RAD M_PI/180.0
 
+/**
+ * Initializes the world state
+ */
 World::World(int w, int h, int n) {
 
 	width = w;
@@ -47,48 +55,77 @@ World::~World() {
 	// TODO Auto-generated destructor stub
 }
 
+/**
+ * A bit of a misnomer, as this method does more
+ * than just "move"
+ *
+ * This updates the state of the game, which includes
+ * adding trails, updating player positions, checking if an
+ * item was hit, and checking for collisions
+ */
 void World::move() {
 	int i;
 	Cycle currentCycle;
 	Trail currentTrail;
 	Coords newPos;
 
+	// Iterate through each player
 	for (i = 0; i < numPlayers; i++) {
+		// If the player is dead, no need to
+		// update his/her state
 		if (cycles[i].getIsDead()) {
 			continue;
 		}
-		Cycle c = cycles[i];
-		c.timer();
-		cycles[i] = c;
 
 		currentCycle = cycles[i];
 		currentTrail = trails[i];
+
+		// Update any item effects
+		currentCycle.timer();
+
+		// Turn the player
 		turn(&currentCycle);
 
+		// Move him/her forward
 		float newX = currentCycle.getPos().x + currentCycle.getSpeed() * cos(
 				currentCycle.getDirection() * DEG_TO_RAD);
 		float newY = currentCycle.getPos().y + currentCycle.getSpeed() * sin(
 				currentCycle.getDirection() * DEG_TO_RAD);
 
+		// Set the player's new position
 		newPos = Coords(newX, newY);
-
 		currentCycle.setPos(newPos);
 
+		// Add the point to the trail
 		currentTrail.addPoint(newPos);
 
+		// Apply the change to the trail
 		trails[i] = currentTrail;
 
+		// Check if the player is still in the bounds
+		// of the world
 		if (!isValidMove(currentCycle)) {
 			kill(&currentCycle);
 		}
+
+		// Check if the player has collected an
+		// item
 		hitItem(&currentCycle);
 
+		// Apply the change to the cycle
 		cycles[i] = currentCycle;
 
 	}
+
+	// Check for collisions. This is called outside the loop
+	// because it's a one-pass check
 	trailDetect();
 }
 
+/**
+ * Adjust the player's direction if he/she is pressing
+ * the appropriate turn key
+ */
 void World::turn(Cycle *c) {
 	float turnSensitivity = 6.0;
 
@@ -106,6 +143,9 @@ void World::turn(Cycle *c) {
 	}
 }
 
+/**
+ * Checks if the player is within the bounds of the room
+ */
 bool World::isValidMove(Cycle c) {
 	Coords pos = c.getPos();
 
@@ -116,6 +156,9 @@ bool World::isValidMove(Cycle c) {
 	return true;
 }
 
+/**
+ * Checks if an item is hit
+ */
 void World::hitItem(Cycle *c) {
 	Coords pos = c->getPos();
 	WorldItem wi;
@@ -134,6 +177,7 @@ void World::hitItem(Cycle *c) {
 			// Item will be inactive for a few seconds
 			items[i] = WorldItem();
 
+			// Apply the effect to the player
 			c->setItemEffect();
 		}
 		wi = items[i];
@@ -148,9 +192,13 @@ double World::distance(Coords a, Coords b) {
 
 }
 
+/**
+ * Checks if any player has crossed a trail
+ */
 void World::trailDetect() {
 
-	unsigned int i, j;
+	unsigned int i;
+	int j;
 	for (j = 0; j < numPlayers; j++) {
 		if (!cycles[j].getIsDead()) {
 			unsigned int f = trails[j].getPoints()->size() - 1;
@@ -191,21 +239,24 @@ bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
 	float cy = c.y;
 	float dx = d.x;
 	float dy = d.y;
+
 	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
 	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
 			* cy))) / denom;
 	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
 			* ay)) / denom;
+
 	if (i > .01 && i < .99 && j > .01 && j < .99)
 		return true;
 	return false;
 }
 
+/**
+ * Kills off the player
+ */
 void World::kill(Cycle *c) {
 	int ID = c->getID();
-	cout << trails[ID].getPoints()->size() << endl;
 	trails[ID].clear();
-	cout << trails[ID].getPoints()->size() << endl;
 	c->setToDead();
 	livePlayers--;
 }

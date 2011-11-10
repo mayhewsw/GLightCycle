@@ -1,6 +1,8 @@
 /*
  * Cycle.cpp
  *
+ * Represents a player
+ *
  *  Created on: Oct 26, 2011
  *      Author: kimsj
  */
@@ -19,7 +21,6 @@ Cycle::Cycle() {
 }
 
 Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
-	// TODO Auto-generated constructor stub
 	pos = start;
 	lastPos = start;
 	direction = dir;
@@ -33,7 +34,6 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 }
 
 Cycle::~Cycle() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -100,6 +100,10 @@ int Cycle::getExplosionTime(){
     return explosionTime;
 }
 
+/**
+ * This method initializes all of the particles that
+ * shoot off when a player collides with something
+ */
 void Cycle::initExplosion(float x, float y, float z){
     int i;
     for (i = 0; i < NUM_PARTICLES; i++){
@@ -140,6 +144,9 @@ void Cycle::initExplosion(float x, float y, float z){
 
 }
 
+/**
+ * This gives the particle a randomly generated speed
+ */
 void Cycle::newSpeed (float dest[3])
 {
     float    x;
@@ -202,11 +209,19 @@ void Cycle::updateExplosionDetails(){
     explosionTime -= 1;
 }
 
+/**
+ * Called when the player picks up an item, this starts
+ * the timer for when the item wears off
+ */
 void Cycle::setItemEffect() {
 	itemEffect = true;
 	seconds = time(NULL);
 }
 
+/**
+ * Checks if enough time has passed. If so,
+ * reset the player's speed
+ */
 void Cycle::timer() {
 	if (!itemEffect) return;
 

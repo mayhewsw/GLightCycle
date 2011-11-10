@@ -13,16 +13,16 @@
 using namespace std;
 
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	unsigned int numplay = 2;
 
-	unsigned int numplay = 4;
-
+	// Prompt the user for the number of players
 	cout << "Enter number of players : " << endl;
-//	cin >> numplay;
+	cin >> numplay;
 
 
-	srand(time(NULL));//initialize random
+	srand(time(NULL));//initialize random seed
 
+	// initialize the world
 	World game = World(BOARD_WIDTH, BOARD_HEIGHT, numplay);
 
 	/* GLFW initialization */
@@ -32,6 +32,7 @@ int main() {
 	int running = GL_TRUE;
 	long counter = 100;
 
+	// Stall the game for a short while to let the players get ready
 	for (long i = 0; i < counter; i++){
 		render(&game);
 	}

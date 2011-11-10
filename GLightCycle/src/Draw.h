@@ -15,7 +15,7 @@
 
 void init();
 void generateGround();
-void drawWorld(World *, bool);
+void drawWorld(World *);
 void drawPlane();
 void drawTrail(Trail *);
 void drawCycle(Cycle *);

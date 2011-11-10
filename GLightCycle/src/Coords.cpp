@@ -1,6 +1,8 @@
 /*
  * Coords.cpp
  *
+ * This class acts more as a struct, helping contain coordinate positions
+ *
  *  Created on: Oct 26, 2011
  *      Author: kimsj
  */
