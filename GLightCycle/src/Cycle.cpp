@@ -21,7 +21,7 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	lastPos = start;
 	direction = dir;
 	ID = color;
-	speed = 0.05;
+	speed = 0.3;
 	leftKey = left;
 	rightKey = right;
 	isDead = 0;
