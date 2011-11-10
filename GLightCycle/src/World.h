@@ -16,6 +16,7 @@
 
 class World {
 	int numPlayers;
+	int livePlayers;
 	Trail *trails;
 	Cycle *cycles;
 	std::vector<WorldItem> items;

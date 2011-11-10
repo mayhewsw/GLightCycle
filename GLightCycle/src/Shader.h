@@ -10,7 +10,7 @@
 
 #include <GL/glew.h>
 
-static int glowSize = 64;
+static int glowSize = 256;
 
 void shaderInit();
 GLuint EmptyTexture();

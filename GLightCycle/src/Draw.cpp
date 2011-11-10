@@ -29,8 +29,8 @@ void initUniformParameters() {
 }
 
 
-int windowWidth = 1000;
-int windowHeight = 1000;
+int windowWidth = 800;
+int windowHeight = 800;
 
 GLuint groundTexture, glowTexture;
 
@@ -198,14 +198,17 @@ void drawWorld(World *state, bool Glow) {
 
 	for (p=0; p<state->getNumPlayers(); p++) {
 	    if (state->getNumPlayers() == 3) {
-		if (p==2) {
-		    glMatrixMode(GL_PROJECTION);
-		    glLoadIdentity();
-		    gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
-		    glMatrixMode(GL_MODELVIEW);
-		}
+			if (p==2) {
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
+				glMatrixMode(GL_MODELVIEW);
+			}
 	    }
 	    Cycle player = state->getCycles()[p];
+	    if (player.getExplosionTime() == 0) {
+	    	continue;
+	    }
 
 	    // Calculate the camera position
 	    GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(player.getDirection()

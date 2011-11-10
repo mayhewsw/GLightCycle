@@ -12,7 +12,7 @@ void main(void)
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t - 3.0*blurSize)) * 0.09;
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t - 2.0*blurSize)) * 0.12;
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t - blurSize)) * 0.15;
-   sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t)) * 0.16;
+   sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t)) * 0.18;
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t + blurSize)) * 0.15;
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t + 2.0*blurSize)) * 0.12;
    sum += texture2D(RTBlurH, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t + 3.0*blurSize)) * 0.09;
