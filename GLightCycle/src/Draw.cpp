@@ -12,6 +12,7 @@
 #include "Draw.h"
 #include <cstdlib>
 #include <GL/glu.h>
+#include <GL/glut.h>
 
 using namespace std;
 
@@ -315,12 +316,24 @@ void drawItem(WorldItem *w) {
 	int height = 1;
 
 	glPushMatrix();
-
 	glTranslatef(w->getPos().x, w->getPos().y, 0);
-	gluCylinder(quadric, ITEM_RADIUS, ITEM_RADIUS, height, 15, 15);
-	gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
-	glTranslatef(0, 0, height);
-	gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
+
+	if (w->getID() == 0) { // kills you, cylinder
+		gluCylinder(quadric, ITEM_RADIUS, ITEM_RADIUS, height, 15, 15);
+		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
+		glTranslatef(0, 0, height);
+		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
+	} else if (w->getID() == 1) { // slower
+		gluCylinder(quadric, ITEM_RADIUS, 0, height, 15, 15);
+		gluDisk(quadric, 0, ITEM_RADIUS, 15, 15);
+	} else if (w->getID() == 2) { // faster
+		glScalef(0.5,0.5,0.5);
+		glTranslatef(0,0,1);
+		glutSolidDodecahedron();
+	}
+
+
+
 
 	glPopMatrix();
 }

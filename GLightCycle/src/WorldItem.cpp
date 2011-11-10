@@ -14,7 +14,7 @@
 using namespace std;
 
 WorldItem::WorldItem() {
-	ID = 1;//rand() % 3; //generate random [0,2]
+	ID = rand() % 3; //generate random [0,2]
 	loc = Coords(rand() % 50, rand() % 50);
 	active = false;
 	seconds = time(NULL);
