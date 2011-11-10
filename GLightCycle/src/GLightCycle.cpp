@@ -21,6 +21,8 @@ int main() {
 //	cin >> numplay;
 
 
+	srand(time(NULL));//initialize random
+
 	World game = World(BOARD_WIDTH, BOARD_HEIGHT, numplay);
 
 	/* GLFW initialization */

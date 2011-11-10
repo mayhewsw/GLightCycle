@@ -8,6 +8,7 @@
 #ifndef CYCLE_H_
 #define CYCLE_H_
 #include "Coords.h"
+#include <ctime>
 
 // Some of the ideas and code for the explosion effect was taken from
 // http://www.student.nada.kth.se/~nv91-gta/OpenGL/examples/explosion.html
@@ -35,6 +36,7 @@ typedef struct debrisData
 #define NUM_DEBRIS 70
 
 #define INITIAL_EXPLOSION_TIME 500
+#define ITEM_EFFECT_TIME 3
 
 
 class Cycle {
@@ -45,6 +47,8 @@ class Cycle {
 	int leftKey, rightKey;
 	bool isDead;
 	int explosionTime;
+	time_t seconds;
+	bool itemEffect;
 	particleData particles[NUM_PARTICLES];
 	debrisData   debris[NUM_DEBRIS]; 
 
@@ -73,6 +77,9 @@ public:
 	debrisData *getDebris();
 	
 	void initExplosion(float, float, float);
+
+	void setItemEffect();
+	void timer();
 
 };
 

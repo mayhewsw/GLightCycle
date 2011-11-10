@@ -9,7 +9,10 @@
 #include <cmath>
 #include <stdlib.h>
 #include "Cycle.h"
+#include <iostream>
 using namespace std;
+
+#define SPEED 0.3
 
 Cycle::Cycle() {
 
@@ -21,11 +24,12 @@ Cycle::Cycle(Coords start, float dir, int color, int left, int right) {
 	lastPos = start;
 	direction = dir;
 	ID = color;
-	speed = 0.3;
+	speed = SPEED;
 	leftKey = left;
 	rightKey = right;
 	isDead = 0;
 	explosionTime = INITIAL_EXPLOSION_TIME;
+	itemEffect = false;
 }
 
 Cycle::~Cycle() {
@@ -196,4 +200,20 @@ void Cycle::updateExplosionDetails(){
 
     // decrement explosion time
     explosionTime -= 1;
+}
+
+void Cycle::setItemEffect() {
+	itemEffect = true;
+	seconds = time(NULL);
+}
+
+void Cycle::timer() {
+	if (!itemEffect) return;
+
+	int t = (int) difftime(time(NULL), seconds);
+
+	if (t > ITEM_EFFECT_TIME) {
+		itemEffect = false;
+		speed = SPEED;
+	}
 }

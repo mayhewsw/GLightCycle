@@ -57,6 +57,10 @@ void World::move() {
 		if (cycles[i].getIsDead()) {
 			continue;
 		}
+		Cycle c = cycles[i];
+		c.timer();
+		cycles[i] = c;
+
 		currentCycle = cycles[i];
 		currentTrail = trails[i];
 		turn(&currentCycle);
@@ -86,7 +90,7 @@ void World::move() {
 }
 
 void World::turn(Cycle *c) {
-	float turnSensitivity = 4.0;
+	float turnSensitivity = 6.0;
 
 	if (glfwGetKey(c->getLeftKey())) {
 		c->setDirection(c->getDirection() + turnSensitivity);
@@ -130,11 +134,11 @@ void World::hitItem(Cycle *c) {
 			// Item will be inactive for a few seconds
 			items[i] = WorldItem();
 
+			c->setItemEffect();
 		}
 		wi = items[i];
 		wi.timer();
 		items[i] = wi;
-
 
 	}
 }
@@ -179,24 +183,21 @@ void World::trailDetect() {
 }
 
 bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
-
-	float u1 = b.x - a.x;
-	float u2 = b.y - a.y;
-	float v1 = d.x - c.x;
-	float v2 = d.y - c.y;
-	float w1 = c.x - a.x;
-	float w2 = c.y - a.y;
-
-
-	float denom = (v1*u2) - (v2*u1);
-
-	float s = ((v2*w1)-(v1*w2))/denom;
-	float t = ((u1*w2)-(u2*w1))/(-denom);
-
-	if (s > .01 && s < .99 && t > .01 && t < .99) {
+	float ax = a.x;
+	float ay = a.y;
+	float bx = b.x;
+	float by = b.y;
+	float cx = c.x;
+	float cy = c.y;
+	float dx = d.x;
+	float dy = d.y;
+	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
+	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
+			* cy))) / denom;
+	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
+			* ay)) / denom;
+	if (i > .01 && i < .99 && j > .01 && j < .99)
 		return true;
-	}
-
 	return false;
 }
 

@@ -14,11 +14,11 @@
 using namespace std;
 
 WorldItem::WorldItem() {
-	srand(time(NULL));//initialize random
-	ID = rand() % 3; //generate random [0,2]
+	ID = 1;//rand() % 3; //generate random [0,2]
 	loc = Coords(rand() % 50, rand() % 50);
 	active = false;
 	seconds = time(NULL);
+
 }
 
 WorldItem::~WorldItem() {
@@ -27,7 +27,7 @@ WorldItem::~WorldItem() {
 
 void WorldItem::timer() {
 	int t = (int) difftime(time(NULL), seconds);
-	cout << t << endl;
+
 	if (t > SPAWN) {
 		active = true;
 	}

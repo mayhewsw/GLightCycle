@@ -9,7 +9,7 @@
 #define WORLDITEM_H_
 #include <time.h>
 #include "Coords.h"
-#define SPAWN 1
+#define SPAWN 5
 class WorldItem {
 	int ID;
 	bool active;
