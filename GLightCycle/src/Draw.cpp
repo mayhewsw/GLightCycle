@@ -10,7 +10,6 @@
 #include <iostream>
 #include "Draw.h"
 #include <cstdlib>
-#include <GL/glew.h>
 #include <GL/glfw.h>
 
 using namespace std;
@@ -18,7 +17,7 @@ using namespace std;
 int windowWidth = 1024;
 int windowHeight = 768;
 
-GLuint groundTexture, glowTexture;
+GLuint groundTexture = 0;
 
 void init() {
 	int r_bits =8, g_bits = 8, b_bits = 8, a_bits=8;
@@ -177,34 +176,34 @@ void drawWorld(World *state) {
 		}
 	    }
 	    Cycle player = state->getCycles()[p];
-	    
+
 	    // Calculate the camera position
 	    GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(player.getDirection()
 								  * DEG_TO_RAD), player.getPos().y - 6
 				      * sin(player.getDirection() * DEG_TO_RAD), 3.0 };
-	    
+
 	    // Calculate the camera's direction
 	    GLfloat camera_dir[3] = {
 		player.getPos().x + cos(player.getDirection() * DEG_TO_RAD), player.getPos().y
 		+ sin(player.getDirection() * DEG_TO_RAD), 0.0 };
-	    
-	    
+
+
 	    glViewport(viewports[p][0], viewports[p][1],
 		       viewports[p][2], viewports[p][3]);
-	    
+
 	    glMatrixMode(GL_MODELVIEW);
 	    glLoadIdentity();
-	    
+
 	    gluLookAt(camera_pos[0], camera_pos[1], camera_pos[2],
 		      camera_dir[0], camera_dir[1], camera_dir[2],
 		      0, 0, 1);
-	    
-	    
+
+
 	    int i, j;
 	    GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
-	    
+
 	    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-	    
+
 //	    glPushMatrix();
 //
 //	    for (i=0; i<state->width; i++) {
@@ -215,7 +214,7 @@ void drawWorld(World *state) {
 //		glTranslated(-state->height, 1.0, 0.0);
 //	    }
 //	    glPopMatrix();
-	    
+
 	    glEnable(GL_TEXTURE_2D);
 	    glDisable(GL_LIGHTING);
 		glBindTexture(GL_TEXTURE_2D, groundTexture);
@@ -237,18 +236,16 @@ void drawWorld(World *state) {
 		glDisable(GL_TEXTURE_2D);
 		glEnable(GL_LIGHTING);
 
-	    if (state->getCycles()[p].getIsDead()) {
-	    	drawExplosion(&(state->getCycles())[p]);
-	    	continue;
-	    }
-	    
-	    
 	    for (i=0; i<state->getNumPlayers(); i++) {
-		drawTrail(&(state->getTrails())[i]);
-		drawCycle(&(state->getCycles())[i]);
+	    	if (state->getCycles()[i].getIsDead()) {
+				drawExplosion(&(state->getCycles())[i]);
+				continue;
+			}
+			drawTrail(&(state->getTrails())[i]);
+			drawCycle(&(state->getCycles())[i]);
 	    }
 	}
-	
+
 	glfwSwapBuffers();
 }
 
@@ -342,10 +339,10 @@ void drawExplosion(Cycle *c){
 
     // if the explosion hasn't happened yet
     if (et == INITIAL_EXPLOSION_TIME){
-	Coords cCoords = c->getPos();				
+	Coords cCoords = c->getPos();
 	c->initExplosion(cCoords.x, cCoords.y, cCoords.z);
     }
-	
+
     //    cout << "ET: " << et << endl;
 
     if(et <= 0){
@@ -354,58 +351,55 @@ void drawExplosion(Cycle *c){
 
     // draw particles going nuts
     glPushMatrix ();
-    
+
     glDisable (GL_LIGHTING);
     glDisable (GL_DEPTH_TEST);
-    
+
     glBegin (GL_POINTS);
-    
+
     int i;
     for (i = 0; i < NUM_PARTICLES; i++){
 	glColor3fv (c->getParticles()[i].color);
 	glVertex3fv (c->getParticles()[i].position);
     }
-    
+
     glEnd ();
-    
+
     glPopMatrix ();
-    
-    glEnable (GL_LIGHTING); 
-    glEnable (GL_LIGHT0); 
+
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
     glEnable (GL_DEPTH_TEST);
-    
+
     glNormal3f (0.0, 0.0, 1.0);
-    
+
     for (i = 0; i < NUM_DEBRIS; i++){
 	glColor3fv (c->getDebris()[i].color);
-	
+
 	glPushMatrix ();
-	
+
 	glTranslatef (c->getDebris()[i].position[0],
 		      c->getDebris()[i].position[1],
 		      c->getDebris()[i].position[2]);
-	
+
 	glRotatef (c->getDebris()[i].orientation[0], 1.0, 0.0, 0.0);
 	glRotatef (c->getDebris()[i].orientation[1], 0.0, 1.0, 0.0);
 	glRotatef (c->getDebris()[i].orientation[2], 0.0, 0.0, 1.0);
-	
+
 	glScalef (c->getDebris()[i].scale[0],
 		  c->getDebris()[i].scale[1],
 		  c->getDebris()[i].scale[2]);
-	
+
 	glBegin (GL_TRIANGLES);
 	glVertex3f (0.0, 0.5, 0.0);
 	glVertex3f (-0.25, 0.0, 0.0);
 	glVertex3f (0.25, 0.0, 0.0);
-	glEnd ();	  
-	
+	glEnd ();
+
 	glPopMatrix ();
     }
-    
-    c->updateExplosionDetails();
-    
 
-    
+    c->updateExplosionDetails();
 }
 
 
