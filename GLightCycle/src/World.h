@@ -33,6 +33,8 @@ public:
 	Trail *getTrails();
 	int getWidth();
 	void setNumPlayers(int);
+	bool intersection(Coords, Coords, Coords, Coords);
+	void trailDetect();
 };
 
 #endif /* WORLD_H_ */
