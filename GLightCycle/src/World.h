@@ -21,6 +21,7 @@
 
 class World {
 	int numPlayers;
+	int livePlayers;
 	Trail *trails;
 	Cycle *cycles;
 	WorldItem *items;

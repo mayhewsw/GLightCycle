@@ -15,7 +15,7 @@ using namespace std;
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
-	unsigned int numplay = 3;
+	unsigned int numplay = 4;
 
 	cout << "Enter number of players : " << endl;
 //	cin >> numplay;
@@ -31,11 +31,11 @@ int main() {
 	long counter = 100;
 
 	for (long i = 0; i < counter; i++){
-		drawWorld(&game);
+		render(&game);
 	}
 
 	while (running) {
-		drawWorld(&game);
+		render(&game);
 		game.move();
 		running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED);
 	}

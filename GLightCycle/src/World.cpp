@@ -18,6 +18,7 @@ using namespace std;
 #define DEG_TO_RAD M_PI/180.0
 
 World::World(int w, int h, int n) {
+<<<<<<< HEAD
 	width = w;
 	height = h;
 	numPlayers = n;
@@ -38,6 +39,25 @@ World::World(int w, int h, int n) {
 	for (int i = 0; i < 3; i++) {// 3 is magic
 		items[i] = WorldItem();
 	}
+=======
+    width = w;
+    height = h;
+    numPlayers = n;
+    livePlayers = numPlayers;
+    trails = new Trail[numPlayers];
+    cycles = new Cycle[numPlayers];
+    int keys[8] = { 'A', 'D', 'J', 'L', GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_KP_4, GLFW_KEY_KP_6 };
+
+    float dir;
+    float startX, startY;
+    for (int i = 0; i < n; i++) {
+        dir = i*90.0;
+        startX = w/2 + cos(dir*DEG_TO_RAD);
+        startY = h/2 + sin(dir*DEG_TO_RAD);
+        cycles[i] = Cycle(Coords(startX, startY), dir, i, keys[i*2], keys[i*2+1]);
+        trails[i] = Trail(Coords(startX, startY), i);
+    }
+>>>>>>> 481793e42af2474af93cb449cec0d5041fd146b3
 }
 
 World::~World() {
@@ -176,6 +196,7 @@ void World::trailDetect() {
 }
 
 bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
+<<<<<<< HEAD
 	float ax = a.x;
 	float ay = a.y;
 	float bx = b.x;
@@ -195,9 +216,51 @@ bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
 	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
 			* ay)) / denom;
 	if (i > .01 && i < .99 && j > .01 && j < .99)
-		return true;
-	return false;
+=======
+//	float ax = a.x;
+//	float ay = a.y;
+//	float bx = b.x;
+//	float by = b.y;
+//	float cx = c.x;
+//	float cy = c.y;
+//	float dx = d.x;
+//	float dy = d.y;
+//	if(ax == cx && ay == cy)
+//		return false;
+//	if(bx == dx && by == dy)
+//		return false;
 
+//	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
+//	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
+//			* cy))) / denom;
+//	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
+//			* ay)) / denom;
+//	if (i > .01 && i < .99 && j > .01 && j < .99 )
+//		return true;
+//	return false;
+
+	float u1 = b.x - a.x;
+	float u2 = b.y - a.y;
+	float v1 = d.x - c.x;
+	float v2 = d.y - c.y;
+	float w1 = c.x - a.x;
+	float w2 = c.y - a.y;
+
+//	if (((w1*v2)-(w2*v1)) == 0) {
+//		return true;
+//	}
+
+	float denom = (v1*u2) - (v2*u1);
+
+	float s = ((v2*w1)-(v1*w2))/denom;
+	float t = ((u1*w2)-(u2*w1))/(-denom);
+
+	if (s > .01 && s < .99 && t > .01 && t < .99) {
+>>>>>>> 481793e42af2474af93cb449cec0d5041fd146b3
+		return true;
+	}
+
+	return false;
 }
 
 void World::kill(Cycle *c) {
@@ -206,6 +269,7 @@ void World::kill(Cycle *c) {
 	trails[ID].clear();
 	cout << trails[ID].getPoints()->size() << endl;
 	c->setToDead();
+	livePlayers--;
 }
 
 Cycle *World::getCycles() {

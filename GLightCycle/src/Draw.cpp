@@ -8,17 +8,32 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include "Shader.h"
 #include "Draw.h"
 #include <cstdlib>
-#include <GL/glfw.h>
 #include <GL/glu.h>
 
 using namespace std;
 
-int windowWidth = 1024;
-int windowHeight = 768;
+// Set the name of the vertex and fragment shaders here
+const char *vShader = "shaders/gaussian.vert";
+const char *fShader1 = "shaders/gaussianHoriz.frag";
+const char *fShader2 = "shaders/gaussianVert.frag";
 
-GLuint groundTexture = 0;
+static GLint horizBlur = 0;
+static GLint vertBlur = 0;
+
+
+void initUniformParameters() {
+	glUniform1i(glGetUniformLocation(horizBlur, "texSize"), glowSize);
+	glUniform1i(glGetUniformLocation(vertBlur, "texSize"), glowSize);
+}
+
+
+int windowWidth = 800;
+int windowHeight = 800;
+
+GLuint groundTexture, glowTexture;
 
 void init() {
 	int r_bits = 8, g_bits = 8, b_bits = 8, a_bits = 8;
@@ -39,7 +54,7 @@ void init() {
 
 	GLfloat light0_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light0_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light0_specular[] = { 0.5, 0.5, 0.5, 1.0 };
+	GLfloat light0_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 
 	/* set up ambient, diffuse, and specular components for light 0 */
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
@@ -55,6 +70,21 @@ void init() {
 	glDepthFunc(GL_LEQUAL);
 
 	generateGround();
+	glowTexture = EmptyTexture();
+
+	shaderInit();
+
+	initShader(vShader, fShader1, &horizBlur);
+	glUseProgram(horizBlur);
+	initUniformParameters();
+
+	glUseProgram(0);
+
+	initShader(vShader, fShader2, &vertBlur);
+	glUseProgram(vertBlur);
+	initUniformParameters();
+
+	glUseProgram(0);
 }
 
 void generateGround() {
@@ -86,7 +116,7 @@ void generateGround() {
 	glBindTexture(GL_TEXTURE_2D, groundTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texSize, texSize, 0, GL_RGBA,
 			GL_UNSIGNED_BYTE, data);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -97,7 +127,7 @@ void generateGround() {
 	free(data);
 }
 
-void drawWorld(World *state) {
+void drawWorld(World *state, bool Glow) {
 	int viewports[4][4];
 
 	glMatrixMode(GL_PROJECTION);
@@ -168,17 +198,18 @@ void drawWorld(World *state) {
 
 	int p;
 
-	for (p = 0; p < state->getNumPlayers(); p++) {
-		if (state->getNumPlayers() == 3) {
-			if (p == 2) {
+	for (p=0; p<state->getNumPlayers(); p++) {
+	    if (state->getNumPlayers() == 3) {
+			if (p==2) {
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				gluPerspective(60.0,
-						(float) (windowWidth) / (windowHeight / 2), 0.1, 200);
+				gluPerspective(60.0, (float)(windowWidth)/(windowHeight/2), 0.1, 200);
 				glMatrixMode(GL_MODELVIEW);
 			}
-		}
 		Cycle player = state->getCycles()[p];
+	    if (player.getExplosionTime() == 0) {
+	    	continue;
+	    }
 
 		// Calculate the camera position
 		GLfloat camera_pos[3] = { player.getPos().x - 6 * cos(
@@ -199,22 +230,11 @@ void drawWorld(World *state) {
 		gluLookAt(camera_pos[0], camera_pos[1], camera_pos[2], camera_dir[0],
 				camera_dir[1], camera_dir[2], 0, 0, 1);
 
-		int i, j;
-		GLfloat light0_position[4] = { state->width / 2, state->height / 2,
-				10.0, 0.0 };
 
 		glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
-		//	    glPushMatrix();
-		//
-		//	    for (i=0; i<state->width; i++) {
-		//		for (j=0; j<state->height; j++) {
-		//		    drawPlane();
-		//		    glTranslated(1.0, 0.0, 0.0);
-		//		}
-		//		glTranslated(-state->height, 1.0, 0.0);
-		//	    }
-		//	    glPopMatrix();
+	    int i;
+	    GLfloat light0_position[4] = { state->width/2, state->height/2, 10.0, 0.0 };
 
 		glEnable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
@@ -256,8 +276,6 @@ void drawWorld(World *state) {
 
 		}
 	}
-
-	glfwSwapBuffers();
 }
 
 void drawItem(WorldItem *w) {
@@ -312,7 +330,7 @@ void drawTrail(Trail *t) {
 	GLfloat trail_specular[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat trail_shininess = 0.0;
-	float r = 0.1, g = 0.1, b = 0.1, a = 0.1;
+	float r=0.1,g=0.1,b=0.1,a=1.0;
 
 	if (t->getID() == 0) {
 		r = 1.0;
@@ -354,16 +372,15 @@ void drawTrail(Trail *t) {
 }
 
 void drawCycle(Cycle *c) {
-
 	//cout << c->getExplosionTime() << endl;
 
 	GLUquadricObj *sphere;
 	sphere = gluNewQuadric();
 	gluQuadricDrawStyle(sphere, GLU_FILL);
 
-	GLfloat cycle_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat cycle_specular[] = { 1.0, 1.0, 1.0, 0.0 };
 	GLfloat cycle_shininess = 128.0;
-	float r = 0.1, g = 0.1, b = 0.1, a = 0.1;
+	float r=0.1,g=0.1,b=0.1,a=0.0;
 
 	if (c->getID() == 0) {
 		r = 1.0;
@@ -460,4 +477,99 @@ void drawExplosion(Cycle *c) {
 	}
 
 	c->updateExplosionDetails();
+}
+
+static void toOrtho() {
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, windowWidth, windowHeight, 0, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+}
+
+static void toPerspective() {
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+void RenderToTexture() {
+	glBindTexture(GL_TEXTURE_2D, glowTexture);
+
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, glowSize, glowSize, 0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void drawTexture(GLint tex) {
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	toOrtho();
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBegin(GL_QUADS);
+	{
+		glTexCoord2f(0, 1);
+		glVertex2f(0, 0);
+
+		glTexCoord2f(0, 0);
+		glVertex2f(0, windowHeight);
+
+		glTexCoord2f(1, 0);
+		glVertex2f(windowWidth, windowHeight);
+
+		glTexCoord2f(1, 1);
+		glVertex2f(windowWidth, 0);
+	}
+	glEnd();
+
+	toPerspective();
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void drawItem(WorldItem *) {
+
+}
+
+void render(World *state) {
+	int tempWidth = windowWidth;
+	int tempHeight = windowHeight;
+
+	windowWidth = glowSize;
+	windowHeight = glowSize;
+
+	drawWorld(state, true);
+	RenderToTexture();
+
+	glViewport(0, 0, glowSize, glowSize);
+	glUseProgram(horizBlur);
+	drawTexture(glowTexture);
+	RenderToTexture();
+
+	glUseProgram(vertBlur);
+	drawTexture(glowTexture);
+	RenderToTexture();
+
+	windowWidth = tempWidth;
+	windowHeight = tempHeight;
+
+	glUseProgram(0);
+	drawWorld(state, false);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glViewport(0, 0, windowWidth, windowHeight);
+	drawTexture(glowTexture);
+	glDisable(GL_BLEND);
+
+	glfwSwapBuffers();
 }
