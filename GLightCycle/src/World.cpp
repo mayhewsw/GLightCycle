@@ -144,12 +144,17 @@ bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
 	float cy = c.y;
 	float dx = d.x;
 	float dy = d.y;
+//	if(ax == cx && ay == cy)
+//		return false;
+//	if(bx == dx && by == dy)
+//		return false;
+
 	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
 	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
 			* cy))) / denom;
 	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
 			* ay)) / denom;
-	if (i > .01 && i < .99 && j > .01 && j < .99)
+	if (i > .01 && i < .99 && j > .01 && j < .99 )
 		return true;
 	return false;
 
