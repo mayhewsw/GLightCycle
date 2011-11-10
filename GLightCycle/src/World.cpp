@@ -18,20 +18,26 @@ using namespace std;
 #define DEG_TO_RAD M_PI/180.0
 
 World::World(int w, int h, int n) {
-    width = w;
-    height = h;
-    numPlayers = n;
-    trails = new Trail[numPlayers];
-    cycles = new Cycle[numPlayers];
-    int keys[8] = { 'A', 'D', 'J', 'L', GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_KP_4, GLFW_KEY_KP_6 };
+	width = w;
+	height = h;
+	numPlayers = n;
+	trails = new Trail[numPlayers];
+	cycles = new Cycle[numPlayers];
+	items = new WorldItem[3];// magic # of items
+	int keys[8] = { 'A', 'D', 'J', 'L', GLFW_KEY_LEFT, GLFW_KEY_RIGHT,
+			GLFW_KEY_KP_4, GLFW_KEY_KP_6 };
+	float dir;
+	for (int i = 0; i < n; i++) {
+		trails[i] = Trail(Coords(w / 2, h / 2), i);
 
-    float dir;
-    for (int i = 0; i < n; i++) {
-        trails[i] = Trail(Coords(w/2, h/2), i);
+		dir = i * 90.0;
+		cycles[i] = Cycle(Coords(w / 2 + cos(dir * DEG_TO_RAD), h / 2 + sin(dir
+				* DEG_TO_RAD)), dir, i, keys[i * 2], keys[i * 2 + 1]);
+	}
 
-        dir = i*90.0;
-        cycles[i] = Cycle(Coords(w/2 + cos(dir*DEG_TO_RAD), h/2 + sin(dir*DEG_TO_RAD)), dir, i, keys[i*2], keys[i*2+1]);
-    }
+	for (int i = 0; i < 3; i++) {// 3 is magic
+		items[i] = WorldItem();
+	}
 }
 
 World::~World() {
@@ -44,7 +50,7 @@ void World::move() {
 	Trail currentTrail;
 	Coords newPos;
 
-	for (i=0; i<numPlayers; i++) {
+	for (i = 0; i < numPlayers; i++) {
 		if (cycles[i].getIsDead()) {
 			continue;
 		}
@@ -52,8 +58,10 @@ void World::move() {
 		currentTrail = trails[i];
 		turn(&currentCycle);
 
-		float newX = currentCycle.getPos().x + currentCycle.getSpeed() * cos(currentCycle.getDirection() * DEG_TO_RAD);
-		float newY = currentCycle.getPos().y + currentCycle.getSpeed() * sin(currentCycle.getDirection() * DEG_TO_RAD);
+		float newX = currentCycle.getPos().x + currentCycle.getSpeed() * cos(
+				currentCycle.getDirection() * DEG_TO_RAD);
+		float newY = currentCycle.getPos().y + currentCycle.getSpeed() * sin(
+				currentCycle.getDirection() * DEG_TO_RAD);
 
 		newPos = Coords(newX, newY);
 
@@ -66,6 +74,7 @@ void World::move() {
 		if (!isValidMove(currentCycle)) {
 			kill(&currentCycle);
 		}
+		hitItem(&currentCycle);
 
 		cycles[i] = currentCycle;
 
@@ -100,15 +109,47 @@ bool World::isValidMove(Cycle c) {
 	return true;
 }
 
+void World::hitItem(Cycle *c) {
+	Coords pos = c->getPos();
+	WorldItem wi;
 
-void World::trailDetect(){
+	for (int i = 0; i < 3; i++) {
+
+		if (distance(items[i].getPos(), pos) <= CYCLE_RADIUS + ITEM_RADIUS) {
+			//action
+			if (items[i].getID() == 0)
+				kill(c);
+			else if (items[i].getID() == 1)
+				c->setSpeed(0.1);
+			else if (items[i].getID() == 2)
+				c->setSpeed(0.5);
+
+			// Item will be inactive for a few seconds
+			items[i] = WorldItem();
+
+		}
+		wi = items[i];
+		wi.timer();
+		items[i] = wi;
+
+
+	}
+}
+
+double World::distance(Coords a, Coords b) {
+	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+
+}
+
+void World::trailDetect() {
 
 	unsigned int i, j;
 	for (j = 0; j < numPlayers; j++) {
 		if (!cycles[j].getIsDead()) {
 			unsigned int f = trails[j].getPoints()->size() - 1;
-			for (i = 1; i < f; i = i+1) {
-				if (!cycles[0].getIsDead() && intersection( cycles[0].getLastPos(), cycles[0].getPos(),
+			for (i = 1; i < f; i = i + 1) {
+				if (!cycles[0].getIsDead() && intersection(
+						cycles[0].getLastPos(), cycles[0].getPos(),
 						trails[j].points[i], trails[j].points[i + 1])) {
 					kill(&cycles[0]);
 				}
@@ -132,7 +173,6 @@ void World::trailDetect(){
 		}
 	}
 
-
 }
 
 bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
@@ -144,17 +184,17 @@ bool World::intersection(Coords a, Coords b, Coords c, Coords d) {
 	float cy = c.y;
 	float dx = d.x;
 	float dy = d.y;
-//	if(ax == cx && ay == cy)
-//		return false;
-//	if(bx == dx && by == dy)
-//		return false;
+	//	if(ax == cx && ay == cy)
+	//		return false;
+	//	if(bx == dx && by == dy)
+	//		return false;
 
 	float denom = ((ay - by) * (cx - dx) - (ax - bx) * (cy - dy));
 	float i = (((ax * by) - (bx * ay) + (bx * cy) - (cx * by) + (cx * ay) - (ax
 			* cy))) / denom;
 	float j = ((cx * dy) - (dx * cy) + (dx * ay) - (ax * dy) + (ax * cy) - (cx
 			* ay)) / denom;
-	if (i > .01 && i < .99 && j > .01 && j < .99 )
+	if (i > .01 && i < .99 && j > .01 && j < .99)
 		return true;
 	return false;
 
@@ -172,7 +212,7 @@ Cycle *World::getCycles() {
 	return cycles;
 }
 
-std::vector<WorldItem> World::getItems() {
+WorldItem *World::getItems(){
 	return items;
 }
 
@@ -184,12 +224,10 @@ Trail *World::getTrails() {
 	return trails;
 }
 
-int World::getWidth()
-{
+int World::getWidth() {
 	return width;
 }
 
-void World::setNumPlayers(int np)
-{
+void World::setNumPlayers(int np) {
 	numPlayers = np;
 }

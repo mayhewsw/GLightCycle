@@ -32,6 +32,7 @@ Cycle::~Cycle() {
 	// TODO Auto-generated destructor stub
 }
 
+
 Coords Cycle::getPos() {
 	return pos;
 }

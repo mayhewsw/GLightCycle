@@ -21,7 +21,7 @@ int main() {
 //	cin >> numplay;
 
 
-	World game = World(50, 50, numplay);
+	World game = World(BOARD_WIDTH, BOARD_HEIGHT, numplay);
 
 	/* GLFW initialization */
 	glfwInit();

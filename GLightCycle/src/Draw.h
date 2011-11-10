@@ -20,5 +20,5 @@ void drawTrail(Trail *);
 void drawCycle(Cycle *);
 void drawItem(WorldItem *);
 void drawExplosion(Cycle *);
-
+void drawItem(WorldItem *);
 #endif /* DRAW_H_ */
