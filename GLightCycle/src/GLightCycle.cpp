@@ -26,6 +26,7 @@ int main() {
 
 		if (numplay == 0) {
 			cout << "Good bye!" << endl;
+			glfwTerminate();
 			exit(0);
 		} else if (numplay < 1 || numplay > 4) {
 			cout << "Please enter a number from 0 to 4" << endl;

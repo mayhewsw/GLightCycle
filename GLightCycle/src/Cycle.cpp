@@ -14,7 +14,7 @@
 #include <iostream>
 using namespace std;
 
-#define SPEED 0.3
+#define SPEED 0.25
 
 Cycle::Cycle() {
 

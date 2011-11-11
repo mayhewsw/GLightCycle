@@ -170,9 +170,9 @@ void World::hitItem(Cycle *c) {
 			if (items[i].getID() == 0)
 				kill(c);
 			else if (items[i].getID() == 1)
-				c->setSpeed(0.1);
+				c->setSpeed(c->getSpeed()*0.5);
 			else if (items[i].getID() == 2)
-				c->setSpeed(0.5);
+				c->setSpeed(c->getSpeed()*1.5);
 
 			// Item will be inactive for a few seconds
 			items[i] = WorldItem();
